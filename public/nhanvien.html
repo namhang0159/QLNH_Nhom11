@@ -56,12 +56,15 @@
           </ul>
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="btn btn-outline-light me-2" href="./index.html"
+              <a
+                class="btn btn-outline-light me-2"
+                href="./index.html"
+                id="btnDangNhap"
                 >Đăng nhập</a
               >
             </li>
             <li class="nav-item">
-              <a class="btn btn-danger" href="#">Đăng xuất</a>
+              <a class="btn btn-danger" href="#" id="btnDangXuat">Đăng xuất</a>
             </li>
           </ul>
         </div>
@@ -77,7 +80,7 @@
       >
         Thêm Nhân Viên
       </button>
-      <table class="table table-bordered">
+      <table class="table table-bordered" id="employeeTable">
         <thead class="table-dark">
           <tr>
             <th>Họ Tên</th>
@@ -93,24 +96,7 @@
             <th>Hành Động</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>Nguyễn Văn A</td>
-            <td>01/01/1990</td>
-            <td>0901234567</td>
-            <td>a@example.com</td>
-            <td>Phục vụ</td>
-            <td>8,000,000</td>
-            <td>nguyenvana</td>
-            <td>********</td>
-            <td>Nhân viên</td>
-            <td>95%</td>
-            <td>
-              <button class="btn btn-warning btn-sm">Sửa</button>
-              <button class="btn btn-danger btn-sm">Xóa</button>
-            </td>
-          </tr>
-        </tbody>
+        <tbody id="employeeList"></tbody>
       </table>
       <nav>
         <ul class="pagination">
@@ -196,7 +182,248 @@
         </div>
       </div>
     </div>
+    <!-- Modal Sửa Nhân Viên -->
+    <div
+      class="modal fade"
+      id="editEmployeeModal"
+      tabindex="-1"
+      aria-labelledby="editEmployeeModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editEmployeeModalLabel">
+              Sửa Nhân Viên
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editEmployeeForm">
+              <input type="hidden" id="editId" />
+              <div class="mb-3">
+                <label class="form-label">Họ Tên</label>
+                <input type="text" class="form-control" id="editHoTen" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Ngày Sinh</label>
+                <input type="date" class="form-control" id="editNgaySinh" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Số Điện Thoại</label>
+                <input type="text" class="form-control" id="editSDT" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="editEmail" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Vị Trí</label>
+                <input type="text" class="form-control" id="editViTri" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Lương</label>
+                <input type="number" class="form-control" id="editLuong" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Tên Tài Khoản</label>
+                <input type="text" class="form-control" id="editTK" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Mật Khẩu</label>
+                <input type="password" class="form-control" id="editMK" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Quyền</label>
+                <select class="form-select" id="editQuyen">
+                  <option>Nhân viên</option>
+                  <option>Admin</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Hiệu Suất (%)</label>
+                <input type="number" class="form-control" id="editHieuSuat" />
+              </div>
+              <button type="submit" class="btn btn-success">Lưu</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./main.js"></script>
+    <script>
+      async function fetchEmployees() {
+        try {
+          const response = await fetch("http://localhost:5000/api/nhanvien"); // API lấy danh sách nhân viên
+          const data = await response.json();
+
+          if (response.ok) {
+            const employeeList = document.getElementById("employeeList");
+            employeeList.innerHTML = ""; // Làm rỗng bảng trước khi hiển thị dữ liệu mới
+
+            // Duyệt qua danh sách nhân viên và tạo các dòng trong bảng
+            data.forEach((employee) => {
+              const row = document.createElement("tr");
+              const birthDate = new Date(employee.ngay_sinh);
+              const formattedDate = birthDate.toISOString().split("T")[0];
+              // Các cột trong bảng
+              row.innerHTML = `
+            <td>${employee.ho_ten}</td>
+            <td>${formattedDate}</td>
+            <td>${employee.so_dien_thoai}</td>
+            <td>${employee.email}</td>
+            <td>${employee.vi_tri}</td>
+            <td>${employee.luong}</td>
+            <td>${employee.ten_tai_khoan}</td>
+            <td>${employee.mat_khau}</td>
+            <td>${employee.quyen}</td>
+            <td>${employee.hieu_suat}</td>
+            <td class="d-flex">
+              <button class="btn btn-warning" onclick='editEmployee(${JSON.stringify(
+                employee
+              )})'>Sửa</button>
+              <button class="btn btn-danger" onclick="deleteEmployee(${
+                employee.id
+              })">Xóa</button>
+            </td>
+          `;
+
+              employeeList.appendChild(row); // Thêm dòng vào bảng
+            });
+          } else {
+            alert("Không thể lấy danh sách nhân viên!");
+          }
+        } catch (error) {
+          console.error("Lỗi khi lấy dữ liệu:", error);
+          alert("Không thể kết nối tới máy chủ!");
+        }
+      }
+
+      // Gọi hàm để hiển thị danh sách nhân viên khi trang được tải
+      window.onload = fetchEmployees;
+    </script>
+    <script>
+      document
+        .querySelector("form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const formData = {
+            ho_Ten: document.querySelector('input[type="text"]').value,
+            ngay_sinh: document.querySelector('input[type="date"]').value,
+            so_dien_thoai:
+              document.querySelectorAll('input[type="text"]')[1].value,
+            email: document.querySelector('input[type="email"]').value,
+            vi_tri: document.querySelectorAll('input[type="text"]')[2].value,
+            luong: document.querySelector('input[type="number"]').value,
+            ten_tai_khoan:
+              document.querySelectorAll('input[type="text"]')[3].value,
+            mat_khau: document.querySelector('input[type="password"]').value,
+            quyen: document.querySelector("select").value,
+            hieu_suat: document.querySelectorAll('input[type="number"]')[1]
+              .value,
+          };
+
+          try {
+            const res = await fetch("http://localhost:5000/api/nhanvien", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(formData),
+            });
+
+            const data = await res.json();
+            alert(data.message);
+            fetchEmployees();
+          } catch (error) {
+            alert("Lỗi khi thêm nhân viên!");
+          }
+        });
+      async function deleteEmployee(id) {
+        if (confirm("Bạn có chắc muốn xóa nhân viên này?")) {
+          try {
+            const res = await fetch(
+              `http://localhost:5000/api/nhanvien/${id}`,
+              {
+                method: "DELETE",
+              }
+            );
+
+            const data = await res.json();
+            alert(data.message);
+            fetchEmployees();
+          } catch (error) {
+            alert("Lỗi khi xóa nhân viên!");
+          }
+        }
+      }
+      function editEmployee(employee) {
+        document.getElementById("editId").value = employee.id;
+        document.getElementById("editHoTen").value = employee.ho_ten;
+        document.getElementById("editNgaySinh").value =
+          employee.ngay_sinh.split("T")[0];
+        document.getElementById("editSDT").value = employee.so_dien_thoai;
+        document.getElementById("editEmail").value = employee.email;
+        document.getElementById("editViTri").value = employee.vi_tri;
+        document.getElementById("editLuong").value = employee.luong;
+        document.getElementById("editTK").value = employee.ten_tai_khoan;
+        document.getElementById("editMK").value = employee.mat_khau;
+        document.getElementById("editQuyen").value = employee.quyen;
+        document.getElementById("editHieuSuat").value = employee.hieu_suat;
+
+        const modal = new bootstrap.Modal(
+          document.getElementById("editEmployeeModal")
+        );
+        modal.show();
+      }
+      document
+        .getElementById("editEmployeeForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const id = document.getElementById("editId").value;
+
+          const formData = {
+            ho_ten: document.getElementById("editHoTen").value,
+            ngay_sinh: document.getElementById("editNgaySinh").value,
+            so_dien_thoai: document.getElementById("editSDT").value,
+            email: document.getElementById("editEmail").value,
+            vi_tri: document.getElementById("editViTri").value,
+            luong: document.getElementById("editLuong").value,
+            ten_tai_khoan: document.getElementById("editTK").value,
+            mat_khau: document.getElementById("editMK").value,
+            quyen: document.getElementById("editQuyen").value,
+            hieu_suat: document.getElementById("editHieuSuat").value,
+          };
+
+          try {
+            const res = await fetch(
+              `http://localhost:5000/api/nhanvien/${id}`,
+              {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+              }
+            );
+
+            const data = await res.json();
+            alert(data.message);
+            fetchEmployees();
+
+            // Ẩn modal sau khi cập nhật
+            const modal = bootstrap.Modal.getInstance(
+              document.getElementById("editEmployeeModal")
+            );
+            modal.hide();
+          } catch (error) {
+            alert("Lỗi khi cập nhật nhân viên!");
+          }
+        });
+    </script>
   </body>
 </html>

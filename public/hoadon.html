@@ -89,7 +89,7 @@
           <button class="btn btn-outline-success" type="submit">Search</button>
         </form>
       </div>
-      <table class="table table-bordered">
+      <table class="table table-bordered" id="hoadonTable">
         <thead class="table-dark">
           <tr>
             <th>Mã Hóa Đơn</th>
@@ -101,20 +101,7 @@
             <th>Hành Động</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>HD001</td>
-            <td>Nguyễn Văn B</td>
-            <td>Nguyễn Văn Á</td>
-            <td>09/03/2025</td>
-            <td>500,000 VND</td>
-            <td>Đã Thanh Toán</td>
-            <td>
-              <button class="btn btn-warning btn-sm">Sửa</button>
-              <button class="btn btn-danger btn-sm">Xóa</button>
-            </td>
-          </tr>
-        </tbody>
+        <tbody id="hoadonbody"></tbody>
       </table>
       <nav>
         <ul class="pagination">
@@ -139,36 +126,146 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Thêm Hóa Đơn</h5>
+            <h5 class="modal-title" id="addInvoiceModalLabel">Thêm Hóa Đơn</h5>
             <button
               type="button"
               class="btn-close"
               data-bs-dismiss="modal"
+              aria-label="Close"
             ></button>
           </div>
           <div class="modal-body">
-            <form>
+            <form id="addInvoiceForm">
               <div class="mb-3">
                 <label class="form-label">Mã Hóa Đơn</label>
-                <input type="text" class="form-control" />
+                <input
+                  type="text"
+                  class="form-control"
+                  id="ma_hoadon"
+                  required
+                />
               </div>
               <div class="mb-3">
-                <label class="form-label">Khách Hàng</label>
-                <input type="text" class="form-control" />
+                <label class="form-label">Khách Hàng (ID)</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="khachhang_id"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Nhân Viên Tạo (ID)</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="nhanvien_id"
+                  required
+                />
               </div>
               <div class="mb-3">
                 <label class="form-label">Ngày Tạo</label>
-                <input type="date" class="form-control" />
+                <input
+                  type="date"
+                  class="form-control"
+                  id="ngay_tao"
+                  required
+                />
               </div>
               <div class="mb-3">
                 <label class="form-label">Tổng Tiền</label>
-                <input type="number" class="form-control" />
+                <input
+                  type="number"
+                  class="form-control"
+                  id="tong_tien"
+                  required
+                />
               </div>
               <div class="mb-3">
                 <label class="form-label">Trạng Thái</label>
-                <select class="form-select">
-                  <option>Chưa Thanh Toán</option>
-                  <option>Đã Thanh Toán</option>
+                <select class="form-select" id="trang_thai">
+                  <option value="Chưa Thanh Toán">Chưa Thanh Toán</option>
+                  <option value="Đã Thanh Toán">Đã Thanh Toán</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-success">Lưu</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="editInvoiceModal"
+      tabindex="-1"
+      aria-labelledby="editInvoiceModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editInvoiceModalLabel">Sửa Hóa Đơn</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editInvoiceForm">
+              <input type="hidden" id="editId" />
+              <div class="mb-3">
+                <label class="form-label">Mã Hóa Đơn</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="edit_ma_hoadon"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Khách Hàng (ID)</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="edit_khachhang_id"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Nhân Viên Tạo (ID)</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="edit_nhanvien_id"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Ngày Tạo</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="edit_ngay_tao"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Tổng Tiền</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="edit_tong_tien"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Trạng Thái</label>
+                <select class="form-select" id="edit_trang_thai">
+                  <option value="Chưa Thanh Toán">Chưa Thanh Toán</option>
+                  <option value="Đã Thanh Toán">Đã Thanh Toán</option>
                 </select>
               </div>
               <button type="submit" class="btn btn-success">Lưu</button>
@@ -179,5 +276,157 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      async function fetchHD() {
+        try {
+          const rep = await fetch("http://localhost:5000/api/hoadon");
+          const data = await rep.json();
+          if (rep.ok) {
+            const ListHD = document.getElementById("hoadonbody");
+            ListHD.innerHTML = "";
+            data.forEach((hoadon) => {
+              const row = document.createElement("tr");
+              const birthDate = new Date(hoadon.ngay_tao);
+              const formattedDate = birthDate.toISOString().split("T")[0];
+              row.innerHTML = `
+                <td>${hoadon.ma_hoadon}</td>
+            <td>${hoadon.khachhang_id}</td>
+            <td>${hoadon.nhanvien_id}</td>
+            <td>${formattedDate}</td>
+            <td>${hoadon.tong_tien}</td>
+            <td>${hoadon.trang_thai}</td>
+            <td class="d-flex">
+                  <button class="btn btn-warning btn-sm" onclick='editInvoice(${JSON.stringify(
+                    hoadon
+                  )})'>Sửa</button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteInvoice('${
+                    hoadon.ma_hoadon
+                  }')">Xóa</button>
+                </td>
+              `;
+              ListHD.appendChild(row);
+            });
+          } else {
+            alert("Khong the lay ds!!");
+          }
+        } catch (error) {
+          console.error("Lỗi khi lấy dữ liệu:", error);
+          alert("Không thể kết nối tới máy chủ!");
+        }
+      }
+      window.onload = fetchHD;
+
+      // Thêm hóa đơn mới
+      document
+        .getElementById("addInvoiceForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const formData = {
+            ma_hoadon: document.getElementById("ma_hoadon").value,
+            khachhang_id: document.getElementById("khachhang_id").value,
+            nhanvien_id: document.getElementById("nhanvien_id").value,
+            ngay_tao: document.getElementById("ngay_tao").value,
+            tong_tien: document.getElementById("tong_tien").value,
+            trang_thai: document.getElementById("trang_thai").value,
+          };
+          try {
+            const res = await fetch("http://localhost:5000/api/hoadon", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(formData),
+            });
+            const data = await res.json();
+            alert(data.message);
+            fetchHD();
+            // Ẩn modal sau khi thêm thành công
+            const modalEl = document.getElementById("addInvoiceModal");
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+            // Reset form
+            document.getElementById("addInvoiceForm").reset();
+          } catch (error) {
+            console.error("Lỗi khi thêm hóa đơn:", error);
+            alert("Lỗi khi thêm hóa đơn!");
+          }
+        });
+
+      // Xóa hóa đơn theo ma_hoadon
+      async function deleteInvoice(ma_hoadon) {
+        if (confirm("Bạn có chắc muốn xóa hóa đơn này?")) {
+          try {
+            const res = await fetch(
+              `http://localhost:5000/api/hoadon/${ma_hoadon}`,
+              {
+                method: "DELETE",
+              }
+            );
+            const data = await res.json();
+            alert(data.message);
+            fetchHD();
+          } catch (error) {
+            console.error("Lỗi khi xóa hóa đơn:", error);
+            alert("Lỗi khi xóa hóa đơn!");
+          }
+        }
+      }
+
+      // Hiển thị modal sửa và đổ dữ liệu của hóa đơn cần sửa (sử dụng ma_hoadon)
+      function editInvoice(hoadon) {
+        // Lưu ma_hoadon làm khóa chính cho việc cập nhật
+        document.getElementById("editMaHoadon").value = hoadon.ma_hoadon;
+        document.getElementById("edit_ma_hoadon").value = hoadon.ma_hoadon;
+        document.getElementById("edit_khachhang_id").value =
+          hoadon.khachhang_id;
+        document.getElementById("edit_nhanvien_id").value = hoadon.nhanvien_id;
+        document.getElementById("edit_ngay_tao").value = new Date(
+          hoadon.ngay_tao
+        )
+          .toISOString()
+          .split("T")[0];
+        document.getElementById("edit_tong_tien").value = hoadon.tong_tien;
+        document.getElementById("edit_trang_thai").value = hoadon.trang_thai;
+        const modal = new bootstrap.Modal(
+          document.getElementById("editInvoiceModal")
+        );
+        modal.show();
+      }
+
+      // Cập nhật hóa đơn (dựa vào ma_hoadon)
+      document
+        .getElementById("editInvoiceForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const ma_hoadon = document.getElementById("editMaHoadon").value;
+          const formData = {
+            ma_hoadon: document.getElementById("edit_ma_hoadon").value,
+            khachhang_id: document.getElementById("edit_khachhang_id").value,
+            nhanvien_id: document.getElementById("edit_nhanvien_id").value,
+            ngay_tao: document.getElementById("edit_ngay_tao").value,
+            tong_tien: document.getElementById("edit_tong_tien").value,
+            trang_thai: document.getElementById("edit_trang_thai").value,
+          };
+          try {
+            const res = await fetch(
+              `http://localhost:5000/api/hoadon/${ma_hoadon}`,
+              {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+              }
+            );
+            const data = await res.json();
+            alert(data.message);
+            fetchHD();
+            // Ẩn modal sau khi cập nhật
+            const modal = bootstrap.Modal.getInstance(
+              document.getElementById("editInvoiceModal")
+            );
+            modal.hide();
+          } catch (error) {
+            console.error("Lỗi khi cập nhật hóa đơn:", error);
+            alert("Lỗi khi cập nhật hóa đơn!");
+          }
+        });
+    </script>
   </body>
 </html>

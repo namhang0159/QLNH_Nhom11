@@ -1,0 +1,19 @@
+{
+  "name": "da_n11",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000Q\u0000L\u0000N\u0000H\u0000_\u0000N\u0000h\u0000o\u0000m\u00001\u00001\u0000\r\u0000 \u0000",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "mysql": "^2.18.1"
+  }
+}
