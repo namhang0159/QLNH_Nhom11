@@ -202,6 +202,148 @@ app.delete("/api/hoadon/:ma_hoadon", (req, res) => {
   });
 });
 
+// --- API: Lấy danh sách khách hàng ---
+app.get("/api/khachhang", (req, res) => {
+  const sql = "SELECT * FROM KhachHang";
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error("Lỗi lấy khách hàng:", err);
+      return res.status(500).json({ message: "Lỗi server!" });
+    }
+    res.json(result);
+  });
+});
+
+// --- API: Thêm khách hàng ---
+app.post("/api/khachhang", (req, res) => {
+  const kh = req.body;
+  const sql =
+    "INSERT INTO KhachHang (HoTen, SoDienThoai, Email, cap_bac) VALUES (?, ?, ?, ?)";
+  const values = [kh.ten, kh.sdt, kh.email, kh.cap_bac];
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Lỗi thêm khách hàng:", err);
+      return res.status(500).json({ message: "Lỗi khi thêm khách hàng!" });
+    }
+    res.status(201).json({ message: "Thêm khách hàng thành công!" });
+  });
+});
+
+// --- API: Xóa khách hàng ---
+app.delete("/api/khachhang/:id", (req, res) => {
+  const id = req.params.id;
+  const sql = "DELETE FROM KhachHang WHERE MaKH = ?";
+  db.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error("Lỗi xóa khách hàng:", err);
+      return res.status(500).json({ message: "Lỗi khi xóa khách hàng!" });
+    }
+    res.json({ message: "Xóa khách hàng thành công!" });
+  });
+});
+
+app.get("/api/khachhang/:id", (req, res) => {
+  const id = req.params.id;
+  const sql = "SELECT * FROM khachhang WHERE MaKH = ?";
+  db.query(sql, [id], (err, result) => {
+    if (err) return res.status(500).json({ error: "Lỗi truy vấn CSDL" });
+    if (result.length === 0)
+      return res.status(404).json({ error: "Không tìm thấy khách hàng" });
+    res.json(result[0]);
+  });
+});
+
+// --- API: Cập nhật khách hàng ---
+app.put("/api/khachhang/:id", (req, res) => {
+  const id = req.params.id;
+  const kh = req.body;
+  const sql = `
+    UPDATE KhachHang 
+    SET HoTen = ?, SoDienThoai = ?, Email = ?, cap_bac = ?
+    WHERE MaKH = ?
+  `;
+  const values = [kh.ten, kh.sdt, kh.email, kh.cap_bac, id];
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Lỗi cập nhật khách hàng:", err);
+      return res.status(500).json({ message: "Lỗi khi cập nhật khách hàng!" });
+    }
+    res.json({ message: "Cập nhật khách hàng thành công!" });
+  });
+});
+
+// --- Lấy danh sách đặt bàn ---
+app.get("/api/datban", (req, res) => {
+  const sql = "SELECT * FROM DatBan";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Lỗi khi lấy dữ liệu đặt bàn:", err);
+      return res.status(500).json({ message: "Lỗi server!" });
+    }
+    res.json(results);
+  });
+});
+
+// --- Thêm đặt bàn mới ---
+app.post("/api/datban", (req, res) => {
+  const { MaKH, MaBan, NgayDat, GioDat, SoLuongNguoi, TrangThai } = req.body;
+  const sql = `
+    INSERT INTO DatBan
+      (MaKH, MaBan, NgayDat, GioDat, SoLuongNguoi, TrangThai)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+  const values = [MaKH, MaBan, NgayDat, GioDat, SoLuongNguoi, TrangThai];
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Lỗi khi thêm đặt bàn:", err);
+      return res.status(500).json({ message: "Lỗi thêm đặt bàn!" });
+    }
+    res
+      .status(201)
+      .json({ message: "Đặt bàn thành công!", MaDatBan: result.insertId });
+  });
+});
+
+// --- Cập nhật đặt bàn ---
+app.put("/api/datban/:id", (req, res) => {
+  const MaDatBan = req.params.id;
+  const { MaKH, MaBan, NgayDat, GioDat, SoLuongNguoi, TrangThai } = req.body;
+  const sql = `
+    UPDATE DatBan
+    SET MaKH = ?, MaBan = ?, NgayDat = ?, GioDat = ?, SoLuongNguoi = ?, TrangThai = ?
+    WHERE MaDatBan = ?
+  `;
+  const values = [
+    MaKH,
+    MaBan,
+    NgayDat,
+    GioDat,
+    SoLuongNguoi,
+    TrangThai,
+    MaDatBan,
+  ];
+  db.query(sql, values, (err) => {
+    if (err) {
+      console.error("Lỗi khi cập nhật đặt bàn:", err);
+      return res.status(500).json({ message: "Lỗi cập nhật đặt bàn!" });
+    }
+    res.json({ message: "Cập nhật đặt bàn thành công!" });
+  });
+});
+
+// --- Xóa đặt bàn ---
+app.delete("/api/datban/:id", (req, res) => {
+  const MaDatBan = req.params.id;
+  const sql = "DELETE FROM DatBan WHERE MaDatBan = ?";
+  db.query(sql, [MaDatBan], (err) => {
+    if (err) {
+      console.error("Lỗi khi xóa đặt bàn:", err);
+      return res.status(500).json({ message: "Lỗi xóa đặt bàn!" });
+    }
+    res.json({ message: "Xóa đặt bàn thành công!" });
+  });
+});
+
 app.listen(5000, () => {
   console.log("Server đang chạy trên cổng 5000...");
 });

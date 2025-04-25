@@ -56,12 +56,15 @@
           </ul>
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="btn btn-outline-light me-2" href="./index.html"
+              <a
+                class="btn btn-outline-light me-2"
+                href="./index.html"
+                id="btnDangNhap"
                 >Đăng nhập</a
               >
             </li>
             <li class="nav-item">
-              <a class="btn btn-danger" href="#">Đăng xuất</a>
+              <a class="btn btn-danger" href="#" id="btnDangXuat">Đăng xuất</a>
             </li>
           </ul>
         </div>
@@ -83,28 +86,11 @@
             <th>Tên Khách Hàng</th>
             <th>Số Điện Thoại</th>
             <th>Email</th>
-            <th>Tài Khoản</th>
-            <th>Mật Khẩu</th>
             <th>Cấp Bậc</th>
-            <th>Khuyến Mãi</th>
             <th>Hành Động</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>Trần Thị C</td>
-            <td>0912345678</td>
-            <td>tranthic@example.com</td>
-            <td>tranthic</td>
-            <td>********</td>
-            <td>VIP</td>
-            <td>10% Giảm giá</td>
-            <td>
-              <button class="btn btn-warning btn-sm">Sửa</button>
-              <button class="btn btn-danger btn-sm">Xóa</button>
-            </td>
-          </tr>
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
 
@@ -141,16 +127,54 @@
                 <input type="email" class="form-control" />
               </div>
               <div class="mb-3">
-                <label class="form-label">Tài Khoản</label>
-                <input type="text" class="form-control" />
+                <label class="form-label">Cấp Bậc</label>
+                <select class="form-select">
+                  <option>Thường</option>
+                  <option>VIP</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-success">Lưu</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- Modal Sửa Khách Hàng -->
+    </div>
+    <div
+      class="modal fade"
+      id="editCustomerModal"
+      tabindex="-1"
+      aria-labelledby="editCustomerModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Sửa Khách Hàng</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editCustomerForm">
+              <input type="hidden" id="editCustomerId" />
+              <div class="mb-3">
+                <label class="form-label">Tên Khách Hàng</label>
+                <input type="text" class="form-control" id="editTenKH" />
               </div>
               <div class="mb-3">
-                <label class="form-label">Mật Khẩu</label>
-                <input type="password" class="form-control" />
+                <label class="form-label">Số Điện Thoại</label>
+                <input type="text" class="form-control" id="editSDT" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="editEmail" />
               </div>
               <div class="mb-3">
                 <label class="form-label">Cấp Bậc</label>
-                <select class="form-select">
+                <select class="form-select" id="editCapBac">
                   <option>Thường</option>
                   <option>VIP</option>
                 </select>
@@ -163,5 +187,120 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const API_URL = "http://localhost:5000/api/khachhang";
+
+      // Tải danh sách khách hàng
+      async function loadCustomers() {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+
+        const tbody = document.querySelector("table tbody");
+        tbody.innerHTML = "";
+
+        data.forEach((kh) => {
+          tbody.innerHTML += `
+            <tr>
+              <td>${kh.HoTen}</td>
+              <td>${kh.SoDienThoai}</td>
+              <td>${kh.Email}</td>
+              <td>${kh.cap_bac}</td>
+              <td>
+                <button class="btn btn-warning btn-sm" onclick="editCustomer(${kh.MaKH})">Sửa</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteCustomer(${kh.MaKH})">Xóa</button>
+              </td>
+            </tr>
+          `;
+        });
+      }
+
+      // Thêm khách hàng mới
+      document
+        .querySelector("form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const inputs = this.querySelectorAll("input, select");
+
+          const newCustomer = {
+            ten: inputs[0].value,
+            sdt: inputs[1].value,
+            email: inputs[2].value,
+            cap_bac: inputs[3].value,
+          };
+
+          await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newCustomer),
+          });
+
+          // Đóng modal và reload
+          const modal = bootstrap.Modal.getInstance(
+            document.getElementById("addCustomerModal")
+          );
+          modal.hide();
+          loadCustomers();
+          this.reset();
+        });
+
+      // Xóa khách hàng
+      async function deleteCustomer(id) {
+        if (confirm("Bạn có chắc chắn muốn xóa?")) {
+          await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+          loadCustomers();
+        }
+      }
+
+      // Gọi khi trang load xong
+      document.addEventListener("DOMContentLoaded", loadCustomers);
+
+      // Hiển thị thông tin khách hàng lên modal sửa
+      async function editCustomer(id) {
+        const res = await fetch(`${API_URL}/${id}`);
+        const kh = await res.json();
+
+        // Kiểm tra xem có lấy được dữ liệu không
+        if (kh) {
+          document.getElementById("editCustomerId").value = kh.MaKH;
+          document.getElementById("editTenKH").value = kh.HoTen;
+          document.getElementById("editSDT").value = kh.SoDienThoai;
+          document.getElementById("editEmail").value = kh.Email;
+          document.getElementById("editCapBac").value = kh.cap_bac;
+
+          const modal = new bootstrap.Modal(
+            document.getElementById("editCustomerModal")
+          );
+          modal.show();
+        }
+      }
+
+      // Cập nhật khách hàng khi submit form sửa
+      document
+        .getElementById("editCustomerForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const id = document.getElementById("editCustomerId").value;
+          const updatedCustomer = {
+            ten: document.getElementById("editTenKH").value,
+            sdt: document.getElementById("editSDT").value,
+            email: document.getElementById("editEmail").value,
+            cap_bac: document.getElementById("editCapBac").value,
+          };
+
+          await fetch(`${API_URL}/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedCustomer),
+          });
+
+          const modal = bootstrap.Modal.getInstance(
+            document.getElementById("editCustomerModal")
+          );
+          modal.hide();
+          loadCustomers();
+        });
+    </script>
+    <script src="./main.js"></script>
   </body>
 </html>
