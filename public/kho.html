@@ -51,17 +51,20 @@
               <a class="nav-link" href="./giaohang.html">Giao hàng</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="./doanhthu.html">Doanh thu</a>
+              <a class="nav-link" href="./doanhthu.html">Bàn Ăn</a>
             </li>
           </ul>
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="btn btn-outline-light me-2" href="./index.html"
+              <a
+                class="btn btn-outline-light me-2"
+                href="./index.html"
+                id="btnDangNhap"
                 >Đăng nhập</a
               >
             </li>
             <li class="nav-item">
-              <a class="btn btn-danger" href="#">Đăng xuất</a>
+              <a class="btn btn-danger" href="#" id="btnDangXuat">Đăng xuất</a>
             </li>
           </ul>
         </div>
@@ -84,21 +87,13 @@
             <th>Số Lượng</th>
             <th>Đơn Vị</th>
             <th>Trạng Thái</th>
+            <th>Nhân viên ID</th>
+            <th>Ngày tạo</th>
+            <th>Ngày cập nhật</th>
             <th>Hành Động</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>Thịt Bò</td>
-            <td>20</td>
-            <td>Kg</td>
-            <td>Còn hàng</td>
-            <td>
-              <button class="btn btn-warning btn-sm">Sửa</button>
-              <button class="btn btn-danger btn-sm">Xóa</button>
-            </td>
-          </tr>
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
 
@@ -121,27 +116,61 @@
             ></button>
           </div>
           <div class="modal-body">
-            <form>
+            <form id="addIngredientForm">
               <div class="mb-3">
                 <label class="form-label">Tên Nguyên Liệu</label>
-                <input type="text" class="form-control" />
+                <input
+                  type="text"
+                  class="form-control"
+                  id="add-ten"
+                  required
+                  name="ten_nguyen_lieu"
+                />
               </div>
               <div class="mb-3">
                 <label class="form-label">Số Lượng</label>
-                <input type="number" class="form-control" />
+                <input
+                  type="number"
+                  class="form-control"
+                  id="add-soluong"
+                  required
+                  name="so_luong"
+                />
               </div>
               <div class="mb-3">
                 <label class="form-label">Đơn Vị</label>
-                <input type="text" class="form-control" />
+                <input
+                  type="text"
+                  class="form-control"
+                  id="add-donvi"
+                  required
+                  name="don_vi"
+                />
               </div>
               <div class="mb-3">
                 <label class="form-label">Trạng Thái</label>
-                <select class="form-select">
-                  <option>Còn hàng</option>
-                  <option>Sắp hết</option>
-                  <option>Hết hàng</option>
+                <select
+                  class="form-select"
+                  name="trang_thai"
+                  id="add-trangthai"
+                  required
+                >
+                  <option value="Còn hàng">Còn hàng</option>
+                  <option value="Sắp hết">Sắp hết</option>
+                  <option value="Hết hàng">Hết hàng</option>
                 </select>
               </div>
+              <div class="mb-3">
+                <label class="form-label">Nhân Viên ID</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="add-nhanvien-id"
+                  required
+                  name="nhanvien_id"
+                />
+              </div>
+              <!-- Ngày tạo và ngày cập nhật tự động backend set nên không cần input -->
               <button type="submit" class="btn btn-success">Lưu</button>
             </form>
           </div>
@@ -149,6 +178,198 @@
       </div>
     </div>
 
+    <!-- Modal Sửa Nguyên Liệu -->
+    <div
+      class="modal fade"
+      id="editIngredientModal"
+      tabindex="-1"
+      aria-labelledby="editIngredientModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Sửa Nguyên Liệu</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Đóng"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editIngredientForm">
+              <input type="hidden" id="edit-id" />
+              <div class="mb-3">
+                <label class="form-label">Tên Nguyên Liệu</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="edit-ten"
+                  required
+                  name="ten_nguyen_lieu"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Số Lượng</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="edit-soluong"
+                  required
+                  name="so_luong"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Đơn Vị</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="edit-donvi"
+                  required
+                  name="don_vi"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Trạng Thái</label>
+                <select
+                  class="form-select"
+                  id="edit-trangthai"
+                  name="trang_thai"
+                  required
+                >
+                  <option value="Còn hàng">Còn hàng</option>
+                  <option value="Sắp hết">Sắp hết</option>
+                  <option value="Hết hàng">Hết hàng</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Nhân Viên ID</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="edit-nhanvien-id"
+                  readonly
+                  name="nhanvien_id"
+                />
+              </div>
+
+              <button type="submit" class="btn btn-primary">Cập nhật</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      function loadKho() {
+        fetch("/api/kho")
+          .then((res) => res.json())
+          .then((data) => {
+            const tbody = document.querySelector("table tbody");
+            tbody.innerHTML = "";
+            data.forEach((kho) => {
+              tbody.innerHTML += `<tr>
+                  <td>${kho.ten_nguyen_lieu}</td>
+                  <td>${kho.so_luong}</td>
+                  <td>${kho.don_vi}</td>
+                  <td>${kho.trang_thai}</td>
+                  <td>${kho.nhanvien_id}</td>
+                  <td>${kho.ngaytao}</td>
+                  <td>${kho.ngayupdate}</td>
+                  <td>
+                    <button class="btn btn-warning btn-sm" onclick="editTable(${kho.id},\'${kho.ten_nguyen_lieu}'\,\'${kho.so_luong}'\, \`${kho.don_vi}\`, \`${kho.trang_thai}\`,\`${kho.nhanvien_id}\`)">Sửa</button>
+
+
+                  <button class="btn btn-danger btn-sm" onclick="deleteIngredient(${kho.id})">Xóa</button>
+                  </td>
+                </tr>`;
+            });
+          });
+      }
+      window.onload = loadKho;
+      document
+        .querySelector("#addIngredientModal form")
+        .addEventListener("submit", function (e) {
+          const formdata = new FormData(this);
+          const data = {
+            ten_nguyen_lieu: formdata.get("ten_nguyen_lieu"),
+            so_luong: formdata.get("so_luong"),
+            don_vi: formdata.get("don_vi"),
+            trang_thai: formdata.get("trang_thai"),
+            nhanvien_id: formdata.get("nhanvien_id"),
+          };
+          fetch("/api/kho", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          }).then((res) => {
+            if (res.ok) {
+              loadKho();
+              this.reset();
+              document.getElementById("addIngredientModal").hide();
+            }
+          });
+        });
+
+      function editTable(
+        id,
+        ten_nguyen_lieu,
+        so_luong,
+        don_vi,
+        trang_thai,
+        nhanvien_id
+      ) {
+        document.getElementById("edit-id").value = id;
+        document.getElementById("edit-ten").value = ten_nguyen_lieu;
+        document.getElementById("edit-soluong").value = so_luong;
+        document.getElementById("edit-donvi").value = don_vi;
+        document.getElementById("edit-trangthai").value = trang_thai;
+        document.getElementById("edit-nhanvien-id").value = nhanvien_id;
+        const modal = new bootstrap.Modal(
+          document.getElementById("editIngredientModal")
+        );
+        modal.show();
+      }
+      document
+        .querySelector("#editIngredientModal form")
+        .addEventListener("submit", function (e) {
+          const formdata = new FormData(this);
+          const id = document.getElementById("edit-id").value;
+          const data = {
+            ten_nguyen_lieu: formdata.get("ten_nguyen_lieu"),
+            so_luong: formdata.get("so_luong"),
+            don_vi: formdata.get("don_vi"),
+            trang_thai: formdata.get("trang_thai"),
+            nhanvien_id: formdata.get("nhanvien_id"),
+          };
+          fetch(`/api/kho/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          }).then((res) => {
+            if (res.ok) {
+              loadKho();
+              const editModal = bootstrap.Modal.getInstance(
+                document.getElementById("editIngredientModal")
+              );
+              editModal.hide();
+            }
+          });
+        });
+      function deleteIngredient(id) {
+        if (confirm("Bạn có chắc chắn muốn xóa nguyên liệu này?")) {
+          fetch(`/api/kho/${id}`, {
+            method: "DELETE",
+          }).then((res) => {
+            if (res.ok) {
+              loadKho();
+            }
+          });
+        }
+      }
+    </script>
+    <script src="./main.js"></script>
   </body>
 </html>

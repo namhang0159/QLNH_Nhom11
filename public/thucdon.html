@@ -51,17 +51,20 @@
               <a class="nav-link" href="./giaohang.html">Giao hàng</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="./doanhthu.html">Doanh thu</a>
+              <a class="nav-link" href="./doanhthu.html">Bàn Ăn</a>
             </li>
           </ul>
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="btn btn-outline-light me-2" href="./index.html"
+              <a
+                class="btn btn-outline-light me-2"
+                href="./index.html"
+                id="btnDangNhap"
                 >Đăng nhập</a
               >
             </li>
             <li class="nav-item">
-              <a class="btn btn-danger" href="#">Đăng xuất</a>
+              <a class="btn btn-danger" href="#" id="btnDangXuat">Đăng xuất</a>
             </li>
           </ul>
         </div>
@@ -86,17 +89,7 @@
             <th>Hành Động</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>Phở Bò</td>
-            <td>50,000 VND</td>
-            <td>Còn hàng</td>
-            <td>
-              <button class="btn btn-warning btn-sm">Sửa</button>
-              <button class="btn btn-danger btn-sm">Xóa</button>
-            </td>
-          </tr>
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
 
@@ -122,15 +115,15 @@
             <form>
               <div class="mb-3">
                 <label class="form-label">Tên Món</label>
-                <input type="text" class="form-control" />
+                <input type="text" class="form-control" name="TenMon" />
               </div>
               <div class="mb-3">
                 <label class="form-label">Giá</label>
-                <input type="number" class="form-control" />
+                <input type="number" class="form-control" name="Gia" />
               </div>
               <div class="mb-3">
                 <label class="form-label">Trạng Thái</label>
-                <select class="form-select">
+                <select class="form-select" name="TrangThai">
                   <option>Còn hàng</option>
                   <option>Hết hàng</option>
                 </select>
@@ -141,7 +134,171 @@
         </div>
       </div>
     </div>
+    <!-- Modal Sửa Món -->
+    <div class="modal fade" id="editDishModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <form class="modal-content" id="formEditDish">
+          <div class="modal-header">
+            <h5 class="modal-title">Sửa Món</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <!-- lưu id tạm -->
+            <input type="hidden" id="edit-id" name="MaMon" />
+            <div class="mb-3">
+              <label class="form-label">Tên Món</label>
+              <input
+                type="text"
+                class="form-control"
+                id="edit-name"
+                required
+                name="TenMon"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Giá</label>
+              <input
+                type="number"
+                class="form-control"
+                id="edit-price"
+                required
+                name="Gia"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Trạng Thái</label>
+              <select class="form-select" id="edit-status" name="TrangThai">
+                <option value="Còn hàng">Còn hàng</option>
+                <option value="Hết hàng">Hết hàng</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Hủy
+            </button>
+            <button type="submit" class="btn btn-success">Cập nhật</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const addModal = new bootstrap.Modal("#addDishModal");
+      const editModal = new bootstrap.Modal("#editDishModal");
+
+      // 1. Load và hiển thị danh sách
+      function loadDishes() {
+        fetch("/api/thucdon")
+          .then((res) => res.json())
+          .then((data) => {
+            const tbody = document.querySelector("table tbody");
+            tbody.innerHTML = "";
+            data.forEach((d) => {
+              tbody.innerHTML += `
+                <tr>
+                  <td>${d.TenMon}</td>
+                  <td>${d.Gia}</td>
+                  <td>${d.TrangThai}</td>
+                  <td>
+                    <button class="btn btn-warning btn-sm" onclick="editTable(${d.MaMon},\'${d.TenMon}'\, \`${d.Gia}\`, \`${d.TrangThai}\`)">Sửa</button>
+
+                  <button class="btn btn-danger btn-sm" onclick="deleteTable(${d.MaMon})">Xóa</button>
+                  </td>
+                </tr>`;
+            });
+          });
+      }
+      document
+        .querySelector("#addDishModal form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+          const data = {
+            TenMon: formData.get("TenMon"),
+            Gia: formData.get("Gia"),
+            TrangThai: formData.get("TrangThai"),
+          };
+
+          fetch("/api/thucdon", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          })
+            .then((res) => {
+              if (res.ok) {
+                loadDishes();
+                this.reset();
+                bootstrap.Modal.getInstance(
+                  document.getElementById("addDishModal")
+                ).hide();
+              }
+            })
+            .catch((err) => console.error(err));
+        });
+      // Mở modal sửa bàn ăn
+      function editTable(MaMon, TenMon, Gia, TrangThai) {
+        document.getElementById("edit-id").value = MaMon;
+        document.getElementById("edit-name").value = TenMon;
+        document.getElementById("edit-price").value = Gia;
+        document.getElementById("edit-status").value = TrangThai;
+
+        editModal.show();
+      }
+
+      // Cập nhật
+      document
+        .getElementById("formEditDish")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+          const data = {
+            TenMon: formData.get("TenMon"),
+            Gia: formData.get("Gia"),
+            TrangThai: formData.get("TrangThai"),
+          };
+          const maMon = document.getElementById("edit-id").value;
+
+          fetch(`/api/thucdon/${formData.get("MaMon")}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          })
+            .then((res) => {
+              if (res.ok) {
+                loadDishes();
+                bootstrap.Modal.getInstance(
+                  document.getElementById("editDishModal")
+                ).hide();
+              }
+            })
+            .catch((err) => console.error(err));
+        });
+      function deleteTable(MaMon) {
+        if (confirm("Bạn có chắc chắn muốn xóa món này?")) {
+          fetch(`/api/thucdon/${MaMon}`, {
+            method: "DELETE",
+          })
+            .then((res) => {
+              if (res.ok) {
+                loadDishes();
+              }
+            })
+            .catch((err) => console.error(err));
+        }
+      }
+      // Khởi chạy lần đầu
+      window.onload = loadDishes;
+    </script>
+    <script src="./main.js"></script>
   </body>
 </html>

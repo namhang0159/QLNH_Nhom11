@@ -344,6 +344,273 @@ app.delete("/api/datban/:id", (req, res) => {
   });
 });
 
+app.get("/api/banan", (req, res) => {
+  const sql = "SELECT * FROM banan";
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error("Lỗi khi lấy dữ liệu đặt bàn:", err);
+      return res.status(500).json({ message: "Lỗi server!" });
+    }
+    res.json(results);
+  });
+});
+// Thêm bàn ăn mới
+app.post("/api/banan", (req, res) => {
+  const { SoChoNgoi, ViTri } = req.body;
+  const sql = "INSERT INTO banan (SoChoNgoi, ViTri) VALUES (?, ?)";
+  const values = [SoChoNgoi, ViTri];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Lỗi khi thêm bàn ăn:", err);
+      return res.status(500).json({ message: "Lỗi khi thêm bàn ăn!" });
+    }
+    res.status(201).json({ message: "Thêm bàn ăn thành công!" });
+  });
+});
+// Sửa thông tin bàn ăn
+app.put("/api/banan/:id", (req, res) => {
+  const id = req.params.id;
+  const { SoChoNgoi, ViTri, TrangThai } = req.body;
+  const sql = `
+    UPDATE banan 
+    SET SoChoNgoi = ?, ViTri = ?, TrangThai = ? 
+    WHERE MaBan = ?`;
+  const values = [SoChoNgoi, ViTri, TrangThai, id];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Lỗi khi cập nhật bàn ăn:", err);
+      return res.status(500).json({ message: "Lỗi khi cập nhật bàn ăn!" });
+    }
+    res.json({ message: "Cập nhật bàn ăn thành công!" });
+  });
+});
+app.delete("/api/banan/:id", (req, res) => {
+  const id = req.params.id;
+  const sql = "DELETE FROM banan WHERE MaBan = ?";
+
+  db.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error("Lỗi khi xóa bàn ăn:", err);
+      return res.status(500).json({ message: "Lỗi khi xóa bàn ăn!" });
+    }
+    res.json({ message: "Xóa bàn ăn thành công!" });
+  });
+});
+
+// --- API: Lấy danh sách món ăn ---
+app.get("/api/thucdon", (req, res) => {
+  const sql = "SELECT * FROM Thucdon";
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error("Lỗi lấy món ăn:", err);
+      return res.status(500).json({ message: "Lỗi server!" });
+    }
+    res.json(result);
+  });
+});
+
+// --- API: Thêm món ăn ---
+app.post("/api/thucdon", (req, res) => {
+  const { TenMon, Gia, TrangThai } = req.body;
+  const sql = `INSERT INTO Thucdon (TenMon, Gia, TrangThai) VALUES (?, ?, ?)`;
+  const values = [TenMon, Gia, TrangThai];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Lỗi thêm món ăn:", err);
+      return res.status(500).json({ message: "Lỗi khi thêm món ăn!" });
+    }
+    res.status(201).json({ message: "Thêm món ăn thành công!" });
+  });
+});
+
+app.put("/api/thucdon/:id", (req, res) => {
+  const id = req.params.id;
+  const { TenMon, Gia, TrangThai } = req.body;
+  const sql = `
+    UPDATE thucdon 
+    SET TenMon = ?, Gia = ?, TrangThai = ? 
+    WHERE MaMon = ?`;
+  const values = [TenMon, Gia, TrangThai, id];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Lỗi cập nhật món ăn:", err);
+      return res.status(500).json({ message: "Lỗi khi cập nhật món ăn!" });
+    }
+    res.json({ message: "Cập nhật món ăn thành công!" });
+  });
+});
+
+app.delete("/api/thucdon/:id", (req, res) => {
+  const id = req.params.id;
+  const sql = "DELETE FROM thucdon WHERE MaMon = ?";
+
+  db.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error("Lỗi khi xóa món ăn:", err);
+      return res.status(500).json({ message: "Lỗi khi xóa món ăn!" });
+    }
+    res.json({ message: "Xóa món ăn thành công!" });
+  });
+});
+
+// --- API: Lấy danh sách kho ---
+app.get("/api/kho", (req, res) => {
+  const sql = "SELECT * FROM Kho";
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error("Lỗi lấy kho:", err);
+      return res.status(500).json({ message: "Lỗi server!" });
+    }
+    res.json(result);
+  });
+});
+
+// --- API: Thêm sản phẩm vào kho ---
+app.post("/api/kho", (req, res) => {
+  const { ten_nguyen_lieu, so_luong, don_vi, trang_thai, nhanvien_id } =
+    req.body;
+  const sql = `INSERT INTO kho (ten_nguyen_lieu, so_luong, don_vi, trang_thai,nhanvien_id) VALUES (?, ?, ?, ?, ?)`;
+  const values = [ten_nguyen_lieu, so_luong, don_vi, trang_thai, nhanvien_id];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Lỗi thêm sản phẩm:", err);
+      return res
+        .status(500)
+        .json({ message: "Lỗi khi thêm sản phẩm vào kho!" });
+    }
+    res.status(201).json({ message: "Thêm sản phẩm vào kho thành công!" });
+  });
+});
+
+// --- API: Cập nhật sản phẩm trong kho ---
+app.put("/api/kho/:id", (req, res) => {
+  const id = req.params.id;
+  const { ten_nguyen_lieu, so_luong, don_vi, trang_thai, nhanvien_id } =
+    req.body;
+  const sql = `
+    UPDATE kho
+    SET ten_nguyen_lieu = ?, so_luong = ?, don_vi = ?, trang_thai = ? , nhanvien_id=?
+    WHERE id = ?
+  `;
+  const values = [
+    ten_nguyen_lieu,
+    so_luong,
+    don_vi,
+    trang_thai,
+    nhanvien_id,
+    id,
+  ];
+
+  db.query(sql, values, (err) => {
+    if (err) {
+      console.error("Lỗi cập nhật sản phẩm kho:", err);
+      return res.status(500).json({ message: "Lỗi cập nhật sản phẩm!" });
+    }
+    res.json({ message: "Cập nhật sản phẩm trong kho thành công!" });
+  });
+});
+
+// --- API: Xóa sản phẩm khỏi kho ---
+app.delete("/api/kho/:id", (req, res) => {
+  const id = req.params.id;
+  const sql = "DELETE FROM Kho WHERE id = ?";
+
+  db.query(sql, [id], (err) => {
+    if (err) {
+      console.error("Lỗi xóa sản phẩm:", err);
+      return res
+        .status(500)
+        .json({ message: "Lỗi khi xóa sản phẩm khỏi kho!" });
+    }
+    res.json({ message: "Xóa sản phẩm khỏi kho thành công!" });
+  });
+});
+
+// --- API: Lấy danh sách giao hàng ---
+app.get("/api/giaohang", (req, res) => {
+  const sql = "SELECT * FROM giaohang";
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error("Lỗi lấy danh sách giao hàng:", err);
+      return res.status(500).json({ message: "Lỗi server!" });
+    }
+    res.json(result);
+  });
+});
+
+// --- API: Lấy 1 giao hàng theo mã ---
+app.get("/api/giaohang/:madon", (req, res) => {
+  const madon = req.params.madon;
+  const sql = "SELECT * FROM giaohang WHERE madon = ?";
+  db.query(sql, [madon], (err, result) => {
+    if (err) {
+      console.error("Lỗi lấy đơn giao hàng:", err);
+      return res.status(500).json({ message: "Lỗi server!" });
+    }
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Không tìm thấy đơn giao hàng!" });
+    }
+    res.json(result[0]);
+  });
+});
+
+// --- API: Thêm đơn giao hàng ---
+app.post("/api/giaohang", (req, res) => {
+  const { tenkh, sodienthoai, diachi, trangthai, hoadonid } = req.body;
+  const sql = `
+    INSERT INTO giaohang (tenkh, sodienthoai, diachi, trangthai, hoadonid)
+    VALUES (?, ?, ?, ?, ?)
+  `;
+  const values = [tenkh, sodienthoai, diachi, trangthai, hoadonid];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Lỗi thêm đơn giao hàng:", err);
+      return res.status(500).json({ message: "Lỗi khi thêm giao hàng!" });
+    }
+    res.status(201).json({ message: "Thêm giao hàng thành công!" });
+  });
+});
+
+// --- API: Cập nhật đơn giao hàng ---
+app.put("/api/giaohang/:madon", (req, res) => {
+  const madon = req.params.madon;
+  const { tenkh, sodienthoai, diachi, trangthai, hoadonid } = req.body;
+  const sql = `
+    UPDATE giaohang
+    SET tenkh = ?, sodienthoai = ?, diachi = ?, trangthai = ?, hoadonid = ?
+    WHERE madon = ?
+  `;
+  const values = [tenkh, sodienthoai, diachi, trangthai, hoadonid, madon];
+
+  db.query(sql, values, (err) => {
+    if (err) {
+      console.error("Lỗi cập nhật đơn giao hàng:", err);
+      return res.status(500).json({ message: "Lỗi khi cập nhật giao hàng!" });
+    }
+    res.json({ message: "Cập nhật giao hàng thành công!" });
+  });
+});
+
+// --- API: Xóa đơn giao hàng ---
+app.delete("/api/giaohang/:madon", (req, res) => {
+  const madon = req.params.madon;
+  const sql = "DELETE FROM giaohang WHERE madon = ?";
+
+  db.query(sql, [madon], (err) => {
+    if (err) {
+      console.error("Lỗi xóa đơn giao hàng:", err);
+      return res.status(500).json({ message: "Lỗi khi xóa giao hàng!" });
+    }
+    res.json({ message: "Xóa giao hàng thành công!" });
+  });
+});
+
 app.listen(5000, () => {
   console.log("Server đang chạy trên cổng 5000...");
 });
