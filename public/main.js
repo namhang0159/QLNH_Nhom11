@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.querySelector("#loginForm");
   const btnDangNhap = document.getElementById("btnDangNhap");
   const btnDangXuat = document.getElementById("btnDangXuat");
-
+  const navbar = document.querySelector("navbarNav");
   const user_id = localStorage.getItem("user_id");
   const quyen = localStorage.getItem("quyen");
 
@@ -41,10 +41,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (form) form.style.display = "none";
     if (btnDangNhap) btnDangNhap.style.display = "none";
     if (btnDangXuat) btnDangXuat.style.display = "inline-block";
+    if (navbar) navbar.style.display = "block";
   } else {
     if (form) form.style.display = "block";
     if (btnDangNhap) btnDangNhap.style.display = "inline-block";
     if (btnDangXuat) btnDangXuat.style.display = "none";
+    if (navbar) navbar.style.display = "none";
   }
 
   // Xử lý đăng xuất
