@@ -29,13 +29,13 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto">
-            <li class="nav-item">
+            <li class="nav-item admint">
               <a class="nav-link" href="./nhanvien.html">Nhân viên</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="./hoadon.html">Hóa đơn</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item admint">
               <a class="nav-link" href="./khachhang.html">Khách hàng</a>
             </li>
             <li class="nav-item">
@@ -55,14 +55,6 @@
             </li>
           </ul>
           <ul class="navbar-nav">
-            <li class="nav-item">
-              <a
-                class="btn btn-outline-light me-2"
-                href="./index.html"
-                id="btnDangNhap"
-                >Đăng nhập</a
-              >
-            </li>
             <li class="nav-item">
               <a class="btn btn-danger" href="#" id="btnDangXuat">Đăng xuất</a>
             </li>
@@ -94,6 +86,49 @@
         </div>
         <button type="submit" class="btn btn-primary">Đăng nhập</button>
       </form>
+    </div>
+    <div id="infoNV" class="container border rounded">
+      <h4 class="mb-3">Thông tin của Ní nè</h4>
+      <div class="row">
+        <div class="col-6">
+          <label class="form-label">Mã Nhân Viên</label>
+          <p id="Manv" class="fw-bold">Chưa có dữ liệu</p>
+        </div>
+        <div class="col-6">
+          <label class="form-label">Họ Tên</label>
+          <p id="Hoten" class="fw-bold">Chưa có dữ liệu</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6">
+          <label class="form-label">Ngày Sinh</label>
+          <p id="Ngaysinh" class="fw-bold">Chưa có dữ liệu</p>
+        </div>
+        <div class="col-6">
+          <label class="form-label">Số Điện Thoại</label>
+          <p id="Sdt" class="fw-bold">Chưa có dữ liệu</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6">
+          <label class="form-label">Email</label>
+          <p id="Email" class="fw-bold">Chưa có dữ liệu</p>
+        </div>
+        <div class="col-6">
+          <label class="form-label">Vị Trí</label>
+          <p id="Vitri" class="fw-bold">Chưa có dữ liệu</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6">
+          <label class="form-label">Lương Căn Bản</label>
+          <p id="Luong" class="fw-bold">Chưa có dữ liệu</p>
+        </div>
+        <div class="col-6">
+          <label class="form-label">Tên Tài Khoản</label>
+          <p id="tentk" class="fw-bold">Chưa có dữ liệu</p>
+        </div>
+      </div>
     </div>
     <!-- Modal Thông báo -->
     <div
@@ -158,6 +193,12 @@
               localStorage.setItem("user_id", data.user_id);
               localStorage.setItem("ten_tai_khoan", data.ten_tai_khoan);
               localStorage.setItem("quyen", data.quyen);
+              localStorage.setItem("ho_ten", data.ho_ten);
+              localStorage.setItem("ngay_sinh", data.ngay_sinh);
+              localStorage.setItem("so_dien_thoai", data.so_dien_thoai);
+              localStorage.setItem("email", data.email);
+              localStorage.setItem("luong", data.luong);
+              localStorage.setItem("vi_tri", data.vi_tri);
 
               // Hiển thị thông tin người dùng sau khi đăng nhập thành công
               document.getElementById(

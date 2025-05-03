@@ -1,5 +1,6 @@
 const express = require("express");
-const mysql = require("mysql");
+const mysql = require("mysql2");
+
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const path = require("path");
@@ -35,10 +36,10 @@ db.connect((err) => {
 app.post("/api/login", (req, res) => {
   const { ten_tai_khoan, mat_khau } = req.body;
 
-  const sql = "SELECT * FROM NhanVien WHERE ten_tai_khoan = ? AND mat_khau = ?";
+  const sql =
+    "SELECT id,ten_tai_khoan,quyen,ho_ten,ngay_sinh,so_dien_thoai,email,luong,vi_tri FROM NhanVien WHERE ten_tai_khoan = ? AND mat_khau = ?";
   db.query(sql, [ten_tai_khoan, mat_khau], (err, result) => {
     if (err) return res.status(500).json({ message: "Lỗi server!" });
-
     if (result.length > 0) {
       const user = result[0];
       res.json({
@@ -46,6 +47,12 @@ app.post("/api/login", (req, res) => {
         user_id: user.id,
         ten_tai_khoan: user.ten_tai_khoan,
         quyen: user.quyen,
+        ho_ten: user.ho_ten,
+        ngay_sinh: user.ngay_sinh,
+        so_dien_thoai: user.so_dien_thoai,
+        email: user.email,
+        luong: user.luong,
+        vi_tri: user.vi_tri,
       });
     } else {
       res.status(401).json({ message: "Sai tài khoản hoặc mật khẩu!" });
