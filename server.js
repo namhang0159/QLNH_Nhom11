@@ -618,6 +618,88 @@ app.delete("/api/giaohang/:madon", (req, res) => {
   });
 });
 
+app.get("/api/chitiethd", (req, res) => {
+  const sql = "SELECT * FROM chitiethd";
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error("Lỗi lấy danh sách ", err);
+      return res.status(500).json({ message: "Lỗi server!" });
+    }
+    res.json(result);
+  });
+});
+
+app.post("/api/chitiethd", (req, res) => {
+  const { MaHD, MaMon, SoLuong } = req.body;
+  const sqlInsert =
+    "INSERT INTO chitiethd (MaHD, MaMon, SoLuong) VALUES (?, ?, ?)";
+  db.query(sqlInsert, [MaHD, MaMon, SoLuong], (err, result) => {
+    if (err) {
+      /* xử lý lỗi */
+    }
+
+    // Cập nhật tổng tiền ngay sau khi thêm thành công
+    const sqlUpdate = `
+      UPDATE hoadon h
+      SET tong_tien = (
+        SELECT COALESCE(SUM(cd.SoLuong * td.Gia), 0)
+        FROM chitiethd cd
+        JOIN thucdon td ON cd.MaMon = td.MaMon
+        WHERE cd.MaHD = ?
+      )
+      WHERE h.ma_hoadon = ?;
+    `;
+    db.query(sqlUpdate, [MaHD, MaHD], (err2) => {
+      if (err2) console.error("Lỗi cập nhật tong_tien:", err2);
+      res
+        .status(201)
+        .json({ message: "Thêm chi tiết và cập nhật tổng tiền thành công!" });
+    });
+  });
+});
+
+app.delete("/api/chitiethd/:MaCTHD", (req, res) => {
+  const MaCTHD = req.params.MaCTHD;
+  // Trước hết, lấy MaHD của bản ghi sắp xóa để dùng khi cập nhật tổng tiền
+  db.query(
+    "SELECT MaHD FROM chitiethd WHERE MaCTHD = ?",
+    [MaCTHD],
+    (err, rows) => {
+      if (err || rows.length === 0)
+        return res
+          .status(400)
+          .json({ message: "Không tìm thấy chi tiết hóa đơn" });
+      const MaHD = rows[0].MaHD;
+
+      // Xóa bản ghi
+      db.query("DELETE FROM chitiethd WHERE MaCTHD = ?", [MaCTHD], (err2) => {
+        if (err2)
+          return res
+            .status(500)
+            .json({ message: "Lỗi khi xóa chi tiết hóa đơn" });
+
+        // Cập nhật lại tổng tiền
+        const sqlUpdate = `
+        UPDATE hoadon h
+        SET tong_tien = (
+          SELECT COALESCE(SUM(cd.SoLuong * td.Gia), 0)
+          FROM chitiethd cd
+          JOIN thucdon td ON cd.MaMon = td.MaMon
+          WHERE cd.MaHD = ?
+        )
+        WHERE h.ma_hoadon = ?;
+      `;
+        db.query(sqlUpdate, [MaHD, MaHD], (err3) => {
+          if (err3) console.error("Lỗi cập nhật tong_tien:", err3);
+          res.json({
+            message: "Xóa chi tiết và cập nhật tổng tiền thành công!",
+          });
+        });
+      });
+    }
+  );
+});
+
 app.listen(5000, () => {
   console.log("Server đang chạy trên cổng 5000...");
 });

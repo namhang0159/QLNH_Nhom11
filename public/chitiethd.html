@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chi tiết Hóa đơn</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body id="oke">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="./index.html"
+          >Quản lý Đóm Con Restaurant</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item admint">
+              <a class="nav-link" href="./nhanvien.html">Nhân viên</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./hoadon.html">Hóa đơn</a>
+            </li>
+            <li class="nav-item admint">
+              <a class="nav-link" href="./khachhang.html">Khách hàng</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./datban.html">Đặt bàn</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./thucdon.html">Thực đơn</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./kho.html">Kho</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./giaohang.html">Giao hàng</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./doanhthu.html">Bàn Ăn </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="./chitiethd.html"
+                >Chi Tiết Hóa Đơn</a
+              >
+            </li>
+          </ul>
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="btn btn-danger" href="#" id="btnDangXuat">Đăng xuất</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-4">
+      <h2>Chi tiết hóa đơn</h2>
+      <button
+        class="btn btn-primary mb-3"
+        data-bs-toggle="modal"
+        data-bs-target="#addModal"
+      >
+        Thêm Chi Tiết
+      </button>
+      <table class="table table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th>MaCTHD</th>
+            <th>MaHD</th>
+            <th>MaMon</th>
+            <th>SoLuong</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="cthdBody"></tbody>
+      </table>
+    </div>
+    <div
+      class="modal fade"
+      id="addModal"
+      tabindex="-1"
+      aria-labelledby="addModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addModalLabel">
+              Thêm Chi Tiết Hóa đơn
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="addForm">
+              <div class="mb-3">
+                <label class="form-label">MaHD</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="inputMaHD"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">MaMon</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="inputMaMon"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">SoLuong</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="inputSoLuong"
+                  required
+                  min="1"
+                />
+              </div>
+              <button type="submit" class="btn btn-success">Lưu</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Lấy id hóa đơn từ URL
+      const params = new URLSearchParams(window.location.search);
+      const API = `http://localhost:5000/api/chitiethd`;
+
+      async function loadCTHD() {
+        const res = await fetch(API);
+        const data = await res.json();
+        const tbody = document.getElementById("cthdBody");
+        tbody.innerHTML = "";
+
+        data.forEach((item) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+          <td>${item.MaCTHD}</td>
+          <td>${item.MaHD}</td>
+          <td>${item.MaMon}</td>
+          <td>${item.SoLuong}</td>
+          <td>
+            <button class="btn btn-danger btn-sm" onclick="deleteCTHD(${item.MaCTHD})">Xóa</button>
+          </td>
+        `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Thêm chi tiết
+      document
+        .getElementById("addForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const payload = {
+            MaHD: document.getElementById("inputMaHD").value,
+            MaMon: parseInt(document.getElementById("inputMaMon").value),
+            SoLuong: parseInt(document.getElementById("inputSoLuong").value),
+          };
+          await fetch("/api/chitiethd", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const addModal = bootstrap.Modal.getInstance(
+            document.getElementById("addModal")
+          );
+          addModal.hide();
+          loadCTHD();
+          e.target.reset();
+        });
+      document.addEventListener("DOMContentLoaded", loadCTHD);
+      async function deleteCTHD(id) {
+        if (!confirm("Bạn có chắc chắn muốn xóa?")) return;
+        await fetch(`/api/chitiethd/${id}`, { method: "DELETE" });
+        loadCTHD();
+      }
+    </script>
+    <script src="./main.js"></script>
+  </body>
+</html>

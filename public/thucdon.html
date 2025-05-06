@@ -42,7 +42,7 @@
               <a class="nav-link" href="./datban.html">Đặt bàn</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="./thucdon.html">Thực đơn</a>
+              <a class="nav-link active" href="./thucdon.html">Thực đơn</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="./kho.html">Kho</a>
@@ -51,7 +51,10 @@
               <a class="nav-link" href="./giaohang.html">Giao hàng</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="./doanhthu.html">Bàn Ăn</a>
+              <a class="nav-link" href="./doanhthu.html">Bàn Ăn </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./chitiethd.html">Chi Tiết Hóa Đơn</a>
             </li>
           </ul>
           <ul class="navbar-nav">
@@ -62,7 +65,6 @@
         </div>
       </div>
     </nav>
-
     <div class="container mt-4">
       <h2 class="mb-4">Quản lý Thực Đơn</h2>
       <button
@@ -75,6 +77,7 @@
       <table class="table table-bordered">
         <thead class="table-dark">
           <tr>
+            <th>Mã Món</th>
             <th>Tên Món</th>
             <th>Giá</th>
             <th>Trạng Thái</th>
@@ -198,6 +201,7 @@
             data.forEach((d) => {
               tbody.innerHTML += `
                 <tr>
+                  <td>${d.MaMon}</td>
                   <td>${d.TenMon}</td>
                   <td>${d.Gia}</td>
                   <td>${d.TrangThai}</td>
