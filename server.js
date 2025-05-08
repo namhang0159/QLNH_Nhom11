@@ -153,13 +153,12 @@ app.get("/api/hoadon", (req, res) => {
 
 app.post("/api/hoadon", (req, res) => {
   const hd = req.body;
-  const sql = `INSERT INTO HoaDon (ma_hoadon, khachhang_id, nhanvien_id, ngay_tao, tong_tien, trang_thai)
-               VALUES (?, ?, ?, ?, ?, ?)`;
+  const sql = `INSERT INTO HoaDon (ma_hoadon, khachhang_id, nhanvien_id, tong_tien, trang_thai)
+               VALUES (?, ?, ?, ?, ?)`;
   const values = [
     hd.ma_hoadon,
     hd.khachhang_id,
     hd.nhanvien_id,
-    hd.ngay_tao,
     hd.tong_tien,
     hd.trang_thai,
   ];
@@ -294,6 +293,12 @@ app.get("/api/datban", (req, res) => {
 // --- Thêm đặt bàn mới ---
 app.post("/api/datban", (req, res) => {
   const { MaKH, MaBan, NgayDat, GioDat, SoLuongNguoi, TrangThai } = req.body;
+  const today = new Date().toISOString().split("T")[0];
+  if (NgayDat < today) {
+    return res
+      .status(400)
+      .json({ message: "Ngày đặt phải là hôm nay hoặc tương lai" });
+  }
   const sql = `
     INSERT INTO DatBan
       (MaKH, MaBan, NgayDat, GioDat, SoLuongNguoi, TrangThai)
@@ -315,6 +320,12 @@ app.post("/api/datban", (req, res) => {
 app.put("/api/datban/:id", (req, res) => {
   const MaDatBan = req.params.id;
   const { MaKH, MaBan, NgayDat, GioDat, SoLuongNguoi, TrangThai } = req.body;
+  const today = new Date().toISOString().split("T")[0];
+  if (NgayDat < today) {
+    return res
+      .status(400)
+      .json({ message: "Ngày đặt phải là hôm nay hoặc tương lai" });
+  }
   const sql = `
     UPDATE DatBan
     SET MaKH = ?, MaBan = ?, NgayDat = ?, GioDat = ?, SoLuongNguoi = ?, TrangThai = ?
