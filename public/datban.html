@@ -178,6 +178,11 @@
     <script>
       // Lấy và hiển thị danh sách đặt bàn
       function loadDatBan() {
+        function formatNgayDat(ngayIso) {
+          const date = new Date(ngayIso);
+          return date.toLocaleDateString("vi-VN"); // Trả về dạng 08/05/2025
+        }
+
         fetch("/api/datban")
           .then((res) => res.json())
           .then((data) => {
@@ -189,7 +194,7 @@
                 <td>${ban.MaBan}</td>
                 <td>${ban.TrangThai}</td>
                 <td>${ban.MaKH}</td>
-                <td>${ban.NgayDat || "---"}</td>
+                <td>${ban.NgayDat ? formatNgayDat(ban.NgayDat) : "---"}</td>
                 <td>${ban.GioDat || "---"}</td>
                 <td>${ban.SoLuongNguoi}</td>
                 <td>
@@ -245,7 +250,7 @@
         // Xử lý submit form thêm/sửa
         document
           .getElementById("formDatBan")
-          .addEventListener("submit", (e) => {
+          .addEventListener("submit", async (e) => {
             e.preventDefault();
             const f = e.target;
             const payload = {
@@ -261,18 +266,30 @@
             const method = id ? "PUT" : "POST";
             const url = id ? `/api/datban/${id}` : "/api/datban";
 
-            fetch(url, {
-              method,
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            })
-              .then(() => {
-                bootstrap.Modal.getInstance(
-                  document.getElementById("addTableModal")
-                ).hide();
-                loadDatBan();
-              })
-              .catch((err) => console.error(err));
+            try {
+              const res = await fetch(url, {
+                method,
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+              });
+              const data = await res.json();
+              if (!res.ok) {
+                alert(data.message);
+                return;
+              }
+
+              alert(data.message || "Đặt bàn thành công!");
+
+              bootstrap.Modal.getInstance(
+                document.getElementById("addTableModal")
+              ).hide();
+              loadDatBan();
+            } catch (error) {
+              console.error("Error:", error);
+              alert("Có lỗi xảy ra!");
+            }
           });
       });
     </script>

@@ -4,6 +4,7 @@ const mysql = require("mysql2");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const path = require("path");
+const e = require("express");
 
 const app = express();
 app.use(cors());
@@ -162,12 +163,21 @@ app.post("/api/hoadon", (req, res) => {
     hd.tong_tien,
     hd.trang_thai,
   ];
-  db.query(sql, values, (err, result) => {
-    if (err) {
-      console.error("Lỗi khi thêm Hóa Đơn:", err);
-      return res.status(500).json({ message: "Lỗi khi thêm hóa đơn!" });
+  const rows = "SELECT * FROM HoaDon WHERE ma_hoadon = ?";
+  db.query(rows, [hd.ma_hoadon], (err, rows) => {
+    if (rows.length > 0) {
+      return res.status(400).json({ message: "Mã hóa đơn đã tồn tại!" });
+    } else {
+      db.query(sql, values, (err, result) => {
+        if (err) {
+          console.error("Lỗi khi thêm Hóa Đơn:", err);
+          return res.status(500).json({ message: "Lỗi khi thêm hóa đơn!" });
+        }
+        res
+          .status(201)
+          .json({ message: "Thêm hóa đơn thành công!", invoice: hd });
+      });
     }
-    res.status(201).json({ message: "Thêm hóa đơn thành công!", invoice: hd });
   });
 });
 
@@ -186,12 +196,19 @@ app.put("/api/hoadon/:ma_hoadon", (req, res) => {
     hd.trang_thai,
     ma_hoadon,
   ];
-  db.query(sql, values, (err, result) => {
-    if (err) {
-      console.error("Lỗi cập nhật Hóa Đơn:", err);
-      return res.status(500).json({ message: "Lỗi khi cập nhật hóa đơn!" });
+  const rows = "SELECT * FROM HoaDon WHERE ma_hoadon = ?";
+  db.query(rows, [hd.ma_hoadon], (err, rows) => {
+    if (rows.length > 0) {
+      return res.status(400).json({ message: "Mã hóa đơn đã tồn tại!" });
+    } else {
+      db.query(sql, values, (err, result) => {
+        if (err) {
+          console.error("Lỗi cập nhật Hóa Đơn:", err);
+          return res.status(500).json({ message: "Lỗi khi cập nhật hóa đơn!" });
+        }
+        res.json({ message: "Cập nhật hóa đơn thành công!" });
+      });
     }
-    res.json({ message: "Cập nhật hóa đơn thành công!" });
   });
 });
 
@@ -290,65 +307,246 @@ app.get("/api/datban", (req, res) => {
   });
 });
 
-// --- Thêm đặt bàn mới ---
 app.post("/api/datban", (req, res) => {
   const { MaKH, MaBan, NgayDat, GioDat, SoLuongNguoi, TrangThai } = req.body;
   const today = new Date().toISOString().split("T")[0];
+
+  // Kiểm tra ngày đặt
   if (NgayDat < today) {
     return res
       .status(400)
       .json({ message: "Ngày đặt phải là hôm nay hoặc tương lai" });
   }
-  const sql = `
-    INSERT INTO DatBan
-      (MaKH, MaBan, NgayDat, GioDat, SoLuongNguoi, TrangThai)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `;
-  const values = [MaKH, MaBan, NgayDat, GioDat, SoLuongNguoi, TrangThai];
-  db.query(sql, values, (err, result) => {
+
+  // Kiểm tra sự tồn tại của MaKH và MaBan
+  db.query("SELECT * FROM KhachHang WHERE MaKH = ?", [MaKH], (err, results) => {
     if (err) {
-      console.error("Lỗi khi thêm đặt bàn:", err);
-      return res.status(500).json({ message: "Lỗi thêm đặt bàn!" });
+      console.error("Lỗi khi kiểm tra khách hàng:", err);
+      return res.status(500).json({ message: "Lỗi kiểm tra khách hàng!" });
     }
-    res
-      .status(201)
-      .json({ message: "Đặt bàn thành công!", MaDatBan: result.insertId });
+    if (results.length === 0) {
+      return res.status(400).json({ message: "Mã khách hàng không tồn tại!" });
+    }
+
+    db.query(
+      "SELECT SoChoNgoi FROM BanAn WHERE MaBan = ?",
+      [MaBan],
+      (err, results) => {
+        if (err) {
+          console.error("Lỗi khi kiểm tra bàn ăn:", err);
+          return res.status(500).json({ message: "Lỗi kiểm tra bàn ăn!" });
+        }
+        if (results.length === 0) {
+          return res.status(400).json({ message: "Mã bàn không tồn tại!" });
+        }
+
+        // Kiểm tra số lượng người với số lượng người tối đa của bàn ăn
+        const soLuongBan = results[0].SoChoNgoi;
+        if (SoLuongNguoi > soLuongBan) {
+          return res.status(400).json({
+            message: `Số lượng người không thể vượt quá ${soLuongBan} người cho bàn này!`,
+          });
+        }
+
+        // Kiểm tra trùng ngày giờ
+        const sqlCheckDate = `
+          SELECT * FROM DatBan
+          WHERE MaBan = ? AND NgayDat = ? AND GioDat = ?
+        `;
+        db.query(sqlCheckDate, [MaBan, NgayDat, GioDat], (err, results) => {
+          if (err) {
+            console.error("Lỗi khi kiểm tra trùng ngày giờ:", err);
+            return res
+              .status(500)
+              .json({ message: "Lỗi kiểm tra trùng ngày giờ!" });
+          }
+          if (results.length > 0) {
+            return res
+              .status(400)
+              .json({ message: "Bàn này đã được đặt vào ngày và giờ này!" });
+          }
+
+          // Thực hiện thêm đặt bàn nếu mọi thứ đều hợp lệ
+          const sql = `
+            INSERT INTO DatBan (MaKH, MaBan, NgayDat, GioDat, SoLuongNguoi, TrangThai)
+            VALUES (?, ?, ?, ?, ?, ?)
+          `;
+          const values = [
+            MaKH,
+            MaBan,
+            NgayDat,
+            GioDat,
+            SoLuongNguoi,
+            TrangThai,
+          ];
+          db.query(sql, values, (err, result) => {
+            if (err) {
+              console.error("Lỗi khi thêm đặt bàn:", err);
+              return res.status(500).json({ message: "Lỗi thêm đặt bàn!" });
+            }
+            res.status(201).json({
+              message: "Đặt bàn thành công!",
+              MaDatBan: result.insertId,
+            });
+          });
+        });
+      }
+    );
   });
 });
 
 // --- Cập nhật đặt bàn ---
+// app.put("/api/datban/:id", (req, res) => {
+//   const MaDatBan = req.params.id;
+//   const { MaKH, MaBan, NgayDat, GioDat, SoLuongNguoi, TrangThai } = req.body;
+//   const today = new Date().toISOString().split("T")[0];
+//   if (NgayDat < today) {
+//     return res
+//       .status(400)
+//       .json({ message: "Ngày đặt phải là hôm nay hoặc tương lai" });
+//   }
+//   const sql = `
+//     UPDATE DatBan
+//     SET MaKH = ?, MaBan = ?, NgayDat = ?, GioDat = ?, SoLuongNguoi = ?, TrangThai = ?
+//     WHERE MaDatBan = ?
+//   `;
+//   const values = [
+//     MaKH,
+//     MaBan,
+//     NgayDat,
+//     GioDat,
+//     SoLuongNguoi,
+//     TrangThai,
+//     MaDatBan,
+//   ];
+//   db.query(sql, values, (err) => {
+//     if (err) {
+//       console.error("Lỗi khi cập nhật đặt bàn:", err);
+//       return res.status(500).json({ message: "Lỗi cập nhật đặt bàn!" });
+//     }
+//     res.json({ message: "Cập nhật đặt bàn thành công!" });
+//   });
+// });
 app.put("/api/datban/:id", (req, res) => {
   const MaDatBan = req.params.id;
   const { MaKH, MaBan, NgayDat, GioDat, SoLuongNguoi, TrangThai } = req.body;
   const today = new Date().toISOString().split("T")[0];
+
+  // Kiểm tra ngày đặt
   if (NgayDat < today) {
     return res
       .status(400)
       .json({ message: "Ngày đặt phải là hôm nay hoặc tương lai" });
   }
-  const sql = `
-    UPDATE DatBan
-    SET MaKH = ?, MaBan = ?, NgayDat = ?, GioDat = ?, SoLuongNguoi = ?, TrangThai = ?
-    WHERE MaDatBan = ?
-  `;
-  const values = [
-    MaKH,
-    MaBan,
-    NgayDat,
-    GioDat,
-    SoLuongNguoi,
-    TrangThai,
-    MaDatBan,
-  ];
-  db.query(sql, values, (err) => {
-    if (err) {
-      console.error("Lỗi khi cập nhật đặt bàn:", err);
-      return res.status(500).json({ message: "Lỗi cập nhật đặt bàn!" });
-    }
-    res.json({ message: "Cập nhật đặt bàn thành công!" });
-  });
-});
 
+  // Kiểm tra tồn tại MaDatBan
+  db.query(
+    "SELECT * FROM DatBan WHERE MaDatBan = ?",
+    [MaDatBan],
+    (err, results) => {
+      if (err) {
+        console.error("Lỗi khi kiểm tra đặt bàn:", err);
+        return res.status(500).json({ message: "Lỗi kiểm tra đặt bàn!" });
+      }
+      if (results.length === 0) {
+        return res.status(404).json({ message: "Mã đặt bàn không tồn tại!" });
+      }
+
+      // Kiểm tra sự tồn tại của MaKH và MaBan
+      db.query(
+        "SELECT * FROM KhachHang WHERE MaKH = ?",
+        [MaKH],
+        (err, results) => {
+          if (err) {
+            console.error("Lỗi khi kiểm tra khách hàng:", err);
+            return res
+              .status(500)
+              .json({ message: "Lỗi kiểm tra khách hàng!" });
+          }
+          if (results.length === 0) {
+            return res
+              .status(400)
+              .json({ message: "Mã khách hàng không tồn tại!" });
+          }
+
+          db.query(
+            "SELECT * FROM BanAn WHERE MaBan = ?",
+            [MaBan],
+            (err, results) => {
+              if (err) {
+                console.error("Lỗi khi kiểm tra bàn ăn:", err);
+                return res
+                  .status(500)
+                  .json({ message: "Lỗi kiểm tra bàn ăn!" });
+              }
+              if (results.length === 0) {
+                return res
+                  .status(400)
+                  .json({ message: "Mã bàn không tồn tại!" });
+              }
+
+              // Kiểm tra số lượng người với số lượng người tối đa của bàn ăn
+              const soLuongBan = results[0].SoLuongNguoi;
+              if (SoLuongNguoi > soLuongBan) {
+                return res.status(400).json({
+                  message: `Số lượng người không thể vượt quá ${soLuongBan} người cho bàn này!`,
+                });
+              }
+
+              // Kiểm tra trùng ngày giờ
+              const sqlCheckDate = `
+            SELECT * FROM DatBan
+            WHERE MaBan = ? AND NgayDat = ? AND GioDat = ? AND MaDatBan != ?
+          `;
+              db.query(
+                sqlCheckDate,
+                [MaBan, NgayDat, GioDat, MaDatBan],
+                (err, results) => {
+                  if (err) {
+                    console.error("Lỗi khi kiểm tra trùng ngày giờ:", err);
+                    return res
+                      .status(500)
+                      .json({ message: "Lỗi kiểm tra trùng ngày giờ!" });
+                  }
+                  if (results.length > 0) {
+                    return res.status(400).json({
+                      message: "Bàn này đã được đặt vào ngày và giờ này!",
+                    });
+                  }
+
+                  // Tiến hành cập nhật đặt bàn
+                  const sql = `
+              UPDATE DatBan
+              SET MaKH = ?, MaBan = ?, NgayDat = ?, GioDat = ?, SoLuongNguoi = ?, TrangThai = ?
+              WHERE MaDatBan = ?
+            `;
+                  const values = [
+                    MaKH,
+                    MaBan,
+                    NgayDat,
+                    GioDat,
+                    SoLuongNguoi,
+                    TrangThai,
+                    MaDatBan,
+                  ];
+                  db.query(sql, values, (err) => {
+                    if (err) {
+                      console.error("Lỗi khi cập nhật đặt bàn:", err);
+                      return res
+                        .status(500)
+                        .json({ message: "Lỗi cập nhật đặt bàn!" });
+                    }
+                    res.json({ message: "Cập nhật đặt bàn thành công!" });
+                  });
+                }
+              );
+            }
+          );
+        }
+      );
+    }
+  );
+});
 // --- Xóa đặt bàn ---
 app.delete("/api/datban/:id", (req, res) => {
   const MaDatBan = req.params.id;

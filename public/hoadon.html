@@ -81,11 +81,16 @@
           <input
             class="form-control me-2"
             type="search"
-            placeholder="Tên hoặc mã hóa đơn"
+            placeholder="Tìm Kiếm Hóa Đơn"
             aria-label="Search"
           />
-          <input type="date" name="date" class="form-control me-2" />
-          <button class="btn btn-outline-success" type="submit">Search</button>
+          <button
+            class="btn btn-outline-success"
+            type="button"
+            onclick="timhoadon()"
+          >
+            Search
+          </button>
         </form>
       </div>
       <table class="table table-bordered" id="hoadonTable">
@@ -102,16 +107,6 @@
         </thead>
         <tbody id="hoadonbody"></tbody>
       </table>
-      <nav>
-        <ul class="pagination">
-          <li class="page-item">
-            <a class="page-link" href="#" id="prevPage">Trước</a>
-          </li>
-          <li class="page-item">
-            <a class="page-link" href="#" id="nextPage">Tiếp</a>
-          </li>
-        </ul>
-      </nav>
     </div>
 
     <!-- Modal Thêm Hóa Đơn -->
@@ -279,21 +274,21 @@
               const birthDate = new Date(hoadon.ngay_tao);
               const formattedDate = birthDate.toISOString().split("T")[0];
               row.innerHTML = `
-                <td>${hoadon.ma_hoadon}</td>
-            <td>${hoadon.khachhang_id}</td>
-            <td>${hoadon.nhanvien_id}</td>
-            <td>${formattedDate}</td>
-            <td>${hoadon.tong_tien}</td>
-            <td>${hoadon.trang_thai}</td>
-            <td class="d-flex">
-                  <button class="btn btn-warning btn-sm" onclick='editInvoice(${JSON.stringify(
-                    hoadon
-                  )})'>Sửa</button>
-                  <button class="btn btn-danger btn-sm" onclick="deleteInvoice('${
-                    hoadon.ma_hoadon
-                  }')">Xóa</button>
-                </td>
-              `;
+                      <td>${hoadon.ma_hoadon}</td>
+                  <td>${hoadon.khachhang_id}</td>
+                  <td>${hoadon.nhanvien_id}</td>
+                  <td>${formattedDate}</td>
+                  <td>${hoadon.tong_tien}</td>
+                  <td>${hoadon.trang_thai}</td>
+                  <td class="d-flex">
+                        <button class="btn btn-warning btn-sm" onclick='editInvoice(${JSON.stringify(
+                          hoadon
+                        )})'>Sửa</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteInvoice('${
+                          hoadon.ma_hoadon
+                        }')">Xóa</button>
+                      </td>
+                    `;
               ListHD.appendChild(row);
             });
           } else {
@@ -311,6 +306,23 @@
         .getElementById("addInvoiceForm")
         .addEventListener("submit", async function (e) {
           e.preventDefault();
+
+          try {
+            const checkRes = await fetch(
+              `http://localhost:5000/api/hoadon/${ma_hoadon}`
+            );
+            if (checkRes.ok) {
+              const checkData = await checkRes.json();
+              if (checkData) {
+                alert("Mã hóa đơn này đã tồn tại!");
+                return; // Dừng hàm nếu mã hóa đơn đã tồn tại
+              }
+            }
+          } catch (error) {
+            console.error("Lỗi khi kiểm tra mã hóa đơn:", error);
+            alert("Không thể kiểm tra mã hóa đơn!");
+            return;
+          }
           const formData = {
             ma_hoadon: document.getElementById("ma_hoadon").value,
             khachhang_id: document.getElementById("khachhang_id").value,
@@ -416,6 +428,26 @@
             alert("Lỗi khi cập nhật hóa đơn!");
           }
         });
+
+      function timhoadon() {
+        const searchInput = document.querySelector('input[type="search"]');
+        const searchValue = searchInput.value.toLowerCase();
+        const rows = document.querySelectorAll("#hoadonbody tr");
+        rows.forEach((row) => {
+          const cells = row.querySelectorAll("td");
+          let found = false;
+          cells.forEach((cell) => {
+            if (cell.textContent.toLowerCase().includes(searchValue)) {
+              found = true;
+            }
+          });
+          if (found) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
     </script>
     <script src="./main.js"></script>
   </body>

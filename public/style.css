@@ -1,0 +1,20 @@
+#img-idol {
+  position: fixed;
+  top: 799px;
+  right: 20px;
+
+  width: 140px;
+  animation: zoomInOut 2s infinite ease-in-out;
+}
+
+@keyframes zoomInOut {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
