@@ -192,7 +192,7 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background-color: rgb(40, 13, 63);
+        background-color: white;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -280,7 +280,8 @@
 
       // Đảm bảo loader hiển thị trong đúng 2 giây
       document.addEventListener("DOMContentLoaded", function () {
-        setTimeout(showContent, 1000);
+        // Hiển thị content sau 2 giây, bất kể trang đã tải xong hay chưa
+        setTimeout(showContent, 1500);
       });
     </script>
     <script src="./main.js"></script>
