@@ -43,31 +43,6 @@
         alias ratione veniam vero deleniti architecto!
       </p>
     </div>
-    <script>
-      // Hàm hiển thị nội dung chính và ẩn loader
-      function showContent() {
-        // Ẩn loader
-        const loader = document.getElementById("loader");
-        if (loader) {
-          loader.style.display = "none";
-        } else {
-          console.error("Không tìm thấy element với id 'loader'");
-        }
-
-        // Hiện nội dung
-        const content = document.getElementById("mainContent");
-        if (content) {
-          content.style.display = "block";
-        } else {
-          console.error("Không tìm thấy element với id 'mainContent'");
-        }
-      }
-
-      // Đảm bảo loader hiển thị trong đúng 2 giây
-      document.addEventListener("DOMContentLoaded", function () {
-        // Hiển thị content sau 2 giây, bất kể trang đã tải xong hay chưa
-        setTimeout(showContent, 1500);
-      });
-    </script>
+    <script></script>
   </body>
 </html>

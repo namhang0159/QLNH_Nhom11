@@ -157,13 +157,14 @@
               </div>
               <div class="mb-3">
                 <label class="form-label">Nhân Viên ID</label>
-                <input
-                  type="number"
-                  class="form-control"
+                <select
+                  class="form-select"
                   id="add-nhanvien-id"
-                  required
                   name="nhanvien_id"
-                />
+                  required
+                >
+                  <option value="">-- Chọn nhân viên --</option>
+                </select>
               </div>
               <!-- Ngày tạo và ngày cập nhật tự động backend set nên không cần input -->
               <button type="submit" class="btn btn-success">Lưu</button>
@@ -240,13 +241,14 @@
               </div>
               <div class="mb-3">
                 <label class="form-label">Nhân Viên ID</label>
-                <input
-                  type="number"
-                  class="form-control"
+                <select
+                  class="form-select"
                   id="edit-nhanvien-id"
-                  readonly
                   name="nhanvien_id"
-                />
+                  required
+                >
+                  <option value="">-- Chọn nhân viên --</option>
+                </select>
               </div>
 
               <button type="submit" class="btn btn-primary">Cập nhật</button>
@@ -283,17 +285,41 @@
             });
           });
       }
-      window.onload = loadKho;
+      function loadNhanVienOptions() {
+        fetch("/api/nhanvien")
+          .then((res) => res.json())
+          .then((data) => {
+            const addSelect = document.getElementById("add-nhanvien-id");
+            const editSelect = document.getElementById("edit-nhanvien-id");
+            addSelect.innerHTML =
+              '<option value="">-- Chọn nhân viên --</option>';
+            editSelect.innerHTML =
+              '<option value="">-- Chọn nhân viên --</option>';
+            data.forEach((nv) => {
+              const option = `<option value="${nv.id}">${nv.id}</option>`;
+              addSelect.innerHTML += option;
+              editSelect.innerHTML += option;
+            });
+          });
+      }
+
+      window.onload = function () {
+        loadKho();
+        loadNhanVienOptions();
+      };
+
       document
         .querySelector("#addIngredientModal form")
         .addEventListener("submit", function (e) {
+          e.preventDefault();
           const formdata = new FormData(this);
+          const nhanvienId = formdata.get("nhanvien_id");
           const data = {
             ten_nguyen_lieu: formdata.get("ten_nguyen_lieu"),
             so_luong: formdata.get("so_luong"),
             don_vi: formdata.get("don_vi"),
             trang_thai: formdata.get("trang_thai"),
-            nhanvien_id: formdata.get("nhanvien_id"),
+            nhanvien_id: parseInt(nhanvienId),
           };
           fetch("/api/kho", {
             method: "POST",
@@ -303,7 +329,10 @@
             if (res.ok) {
               loadKho();
               this.reset();
-              document.getElementById("addIngredientModal").hide();
+              const modal = bootstrap.Modal.getInstance(
+                document.getElementById("addIngredientModal")
+              );
+              if (modal) modal.hide();
             }
           });
         });

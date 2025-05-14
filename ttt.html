@@ -3,286 +3,391 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quản lý Nhân Viên</title>
+    <title>Quản lý Kho</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./style.css" />
   </head>
-  <body>
+  <body id="oke">
     <!-- Navbar -->
-    <div class="mainContent">
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="./index.html"
-            >Quản lý Đóm Con Restaurant</a
-          >
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
-            aria-controls="navbarNav"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-              <li class="nav-item admint">
-                <a class="nav-link" href="./nhanvien.html">Nhân viên</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="./hoadon.html">Hóa đơn</a>
-              </li>
-              <li class="nav-item admint">
-                <a class="nav-link" href="./khachhang.html">Khách hàng</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="./datban.html">Đặt bàn</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="./thucdon.html">Thực đơn</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="./kho.html">Kho</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="./giaohang.html">Giao hàng</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="./doanhthu.html">Bàn Ăn </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="./chitiethd.html">Chi Tiết Hóa Đơn</a>
-              </li>
-            </ul>
-            <ul class="navbar-nav">
-              <li class="nav-item">
-                <a class="btn btn-danger" href="#" id="btnDangXuat"
-                  >Đăng xuất</a
-                >
-              </li>
-            </ul>
-          </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="./index.html"
+          >Quản lý Đóm Con Restaurant</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item admint">
+              <a class="nav-link" href="./nhanvien.html">Nhân viên</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./hoadon.html">Hóa đơn</a>
+            </li>
+            <li class="nav-item admint">
+              <a class="nav-link" href="./khachhang.html">Khách hàng</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./datban.html">Đặt bàn</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./thucdon.html">Thực đơn</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="./kho.html">Kho</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./giaohang.html">Giao hàng</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./doanhthu.html">Bàn Ăn </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./chitiethd.html">Chi Tiết Hóa Đơn</a>
+            </li>
+          </ul>
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="btn btn-danger" href="#" id="btnDangXuat">Đăng xuất</a>
+            </li>
+          </ul>
         </div>
-      </nav>
-      <div
-        class="container d-flex justify-content-center mt-5 align-items-center"
+      </div>
+    </nav>
+
+    <div class="container mt-4">
+      <h2 class="mb-4">Quản lý Kho</h2>
+      <button
+        class="btn btn-primary mb-3"
+        data-bs-toggle="modal"
+        data-bs-target="#addIngredientModal"
       >
-        <h1 class="mb-5">Chào mừng đến với trang quản lý Đóm Con Restaurant</h1>
-      </div>
-      <div class="container">
-        <form id="loginForm">
-          <div class="mb-3">
-            <label class="form-label">Tên Tài Khoản</label>
-            <input type="text" class="form-control" id="username" />
-          </div>
-          <div class="mb-4">
-            <label class="form-label">Mật khẩu</label>
-            <input type="password" class="form-control" id="password" />
-          </div>
-          <div class="mb-3">
-            <p
-              class="text-danger border border-danger-subtle rounded-3 p-3 bg-danger-subtle"
-              style="display: none"
-              id="errorMe"
-            >
-              Sai tên hoặc mật khẩu rồi
-            </p>
-          </div>
-          <button type="submit" class="btn btn-primary">Đăng nhập</button>
-        </form>
-      </div>
-      <div id="infoNV" class="container border rounded">
-        <h4 class="mb-3">Thông tin của Ní nè</h4>
-        <div class="row">
-          <div class="col-6">
-            <label class="form-label">Mã Nhân Viên</label>
-            <p id="Manv" class="fw-bold">Chưa có dữ liệu</p>
-          </div>
-          <div class="col-6">
-            <label class="form-label">Họ Tên</label>
-            <p id="Hoten" class="fw-bold">Chưa có dữ liệu</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-6">
-            <label class="form-label">Ngày Sinh</label>
-            <p id="Ngaysinh" class="fw-bold">Chưa có dữ liệu</p>
-          </div>
-          <div class="col-6">
-            <label class="form-label">Số Điện Thoại</label>
-            <p id="Sdt" class="fw-bold">Chưa có dữ liệu</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-6">
-            <label class="form-label">Email</label>
-            <p id="Email" class="fw-bold">Chưa có dữ liệu</p>
-          </div>
-          <div class="col-6">
-            <label class="form-label">Vị Trí</label>
-            <p id="Vitri" class="fw-bold">Chưa có dữ liệu</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-6">
-            <label class="form-label">Lương Căn Bản</label>
-            <p id="Luong" class="fw-bold">Chưa có dữ liệu</p>
-          </div>
-          <div class="col-6">
-            <label class="form-label">Tên Tài Khoản</label>
-            <p id="tentk" class="fw-bold">Chưa có dữ liệu</p>
-          </div>
-        </div>
-      </div>
-      <img
-        src="./img/466541976_1533435494013704_7809013267081835696_n.webp"
-        alt="IDOLVIP"
-        id="img-idol"
-        class="mb-4"
-      />
-      <!-- Modal Thông báo -->
-      <div
-        class="modal fade"
-        id="successModal"
-        tabindex="-1"
-        aria-labelledby="successModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="successModalLabel">
-                Đăng nhập thành công
-              </h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <p id="textrole" class="text-center fw-bold"></p>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-primary"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                id="goDashboard"
-              >
-                Đóng
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+        Thêm Nguyên Liệu
+      </button>
+      <table class="table table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th>Tên Nguyên Liệu</th>
+            <th>Số Lượng</th>
+            <th>Đơn Vị</th>
+            <th>Trạng Thái</th>
+            <th>Nhân viên ID</th>
+            <th>Ngày tạo</th>
+            <th>Ngày cập nhật</th>
+            <th>Hành Động</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
+
+    <!-- Modal Thêm Nguyên Liệu -->
     <div
-      id="loader"
-      style="
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-      "
+      class="modal fade"
+      id="addIngredientModal"
+      tabindex="-1"
+      aria-labelledby="addIngredientModalLabel"
+      aria-hidden="true"
     >
-      <div
-        class="spinner-border text-primary"
-        role="status"
-        style="width: 4rem; height: 4rem"
-      ></div>
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Thêm Nguyên Liệu</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="addIngredientForm">
+              <div class="mb-3">
+                <label class="form-label">Tên Nguyên Liệu</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="add-ten"
+                  required
+                  name="ten_nguyen_lieu"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Số Lượng</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="add-soluong"
+                  required
+                  name="so_luong"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Đơn Vị</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="add-donvi"
+                  required
+                  name="don_vi"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Trạng Thái</label>
+                <select
+                  class="form-select"
+                  name="trang_thai"
+                  id="add-trangthai"
+                  required
+                >
+                  <option value="Còn hàng">Còn hàng</option>
+                  <option value="Sắp hết">Sắp hết</option>
+                  <option value="Hết hàng">Hết hàng</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Nhân Viên ID</label>
+                <select
+                  class="form-select"
+                  id="add-nhanvien-id"
+                  name="nhanvien_id"
+                  required
+                >
+                  <option value="">-- Chọn nhân viên --</option>
+                </select>
+              </div>
+              <!-- Ngày tạo và ngày cập nhật tự động backend set nên không cần input -->
+              <button type="submit" class="btn btn-success">Lưu</button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- Modal Sửa Nguyên Liệu -->
+    <div
+      class="modal fade"
+      id="editIngredientModal"
+      tabindex="-1"
+      aria-labelledby="editIngredientModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Sửa Nguyên Liệu</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Đóng"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editIngredientForm">
+              <input type="hidden" id="edit-id" />
+              <div class="mb-3">
+                <label class="form-label">Tên Nguyên Liệu</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="edit-ten"
+                  required
+                  name="ten_nguyen_lieu"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Số Lượng</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="edit-soluong"
+                  required
+                  name="so_luong"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Đơn Vị</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="edit-donvi"
+                  required
+                  name="don_vi"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Trạng Thái</label>
+                <select
+                  class="form-select"
+                  id="edit-trangthai"
+                  name="trang_thai"
+                  required
+                >
+                  <option value="Còn hàng">Còn hàng</option>
+                  <option value="Sắp hết">Sắp hết</option>
+                  <option value="Hết hàng">Hết hàng</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Nhân Viên ID</label>
+                <select
+                  class="form-select"
+                  id="edit-nhanvien-id"
+                  name="nhanvien_id"
+                  required
+                >
+                  <option value="">-- Chọn nhân viên --</option>
+                </select>
+              </div>
+
+              <button type="submit" class="btn btn-primary">Cập nhật</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      document
-        .querySelector("#loginForm")
-        .addEventListener("submit", async function (e) {
-          e.preventDefault();
+      function loadKho() {
+        fetch("/api/kho")
+          .then((res) => res.json())
+          .then((data) => {
+            const tbody = document.querySelector("table tbody");
+            tbody.innerHTML = "";
+            data.forEach((kho) => {
+              tbody.innerHTML += `<tr>
+                  <td>${kho.ten_nguyen_lieu}</td>
+                  <td>${kho.so_luong}</td>
+                  <td>${kho.don_vi}</td>
+                  <td>${kho.trang_thai}</td>
+                  <td>${kho.nhanvien_id}</td>
+                  <td>${kho.ngaytao}</td>
+                  <td>${kho.ngayupdate}</td>
+                  <td>
+                    <button class="btn btn-warning btn-sm" onclick="editTable(${kho.id},\'${kho.ten_nguyen_lieu}'\,\'${kho.so_luong}'\, \`${kho.don_vi}\`, \`${kho.trang_thai}\`,\`${kho.nhanvien_id}\`)">Sửa</button>
 
-          const ten_tai_khoan = document.querySelector("#username").value;
-          const mat_khau = document.querySelector("#password").value;
 
-          try {
-            const response = await fetch("http://localhost:5000/api/login", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ ten_tai_khoan, mat_khau }),
+                  <button class="btn btn-danger btn-sm" onclick="deleteIngredient(${kho.id})">Xóa</button>
+                  </td>
+                </tr>`;
             });
-
-            const data = await response.json();
-
-            if (response.ok) {
-              // Lưu thông tin người dùng vào localStorage
-              localStorage.setItem("user_id", data.user_id);
-              localStorage.setItem("ten_tai_khoan", data.ten_tai_khoan);
-              localStorage.setItem("quyen", data.quyen);
-              localStorage.setItem("ho_ten", data.ho_ten);
-              localStorage.setItem("ngay_sinh", data.ngay_sinh);
-              localStorage.setItem("so_dien_thoai", data.so_dien_thoai);
-              localStorage.setItem("email", data.email);
-              localStorage.setItem("luong", data.luong);
-              localStorage.setItem("vi_tri", data.vi_tri);
-
-              // Hiển thị thông tin người dùng sau khi đăng nhập thành công
-              document.getElementById(
-                "textrole"
-              ).innerHTML = `Chào mừng ${data.quyen} of the year`;
-
-              // Hiển thị modal thành công
-              const successModal = new bootstrap.Modal(
-                document.getElementById("successModal")
-              );
-              successModal.show();
-              setTimeout(() => {
-                window.location.reload(); // Reload trang sau khi hiển thị modal
-              }, 3000);
-            } else {
-              document.getElementById("errorMe").style.display = "block";
-            }
-          } catch (error) {
-            console.error("Lỗi kết nối:", error);
-            alert("Không thể kết nối tới máy chủ. Hãy thử lại sau!");
-          }
-        });
-      // Hàm hiển thị nội dung chính và ẩn loader
-      function showContent() {
-        // Ẩn loader
-        const loader = document.getElementById("loader");
-        if (loader) {
-          loader.style.display = "none";
-        } else {
-          console.error("Không tìm thấy element với id 'loader'");
-        }
-
-        // Hiện nội dung
-        const content = document.getElementById("mainContent");
-        if (content) {
-          content.style.display = "block";
-        } else {
-          console.error("Không tìm thấy element với id 'mainContent'");
-        }
+          });
+      }
+      function loadNhanVienOptions() {
+        fetch("/api/nhanvien")
+          .then((res) => res.json())
+          .then((data) => {
+            const addSelect = document.getElementById("add-nhanvien-id");
+            const editSelect = document.getElementById("edit-nhanvien-id");
+            addSelect.innerHTML =
+              '<option value="">-- Chọn nhân viên --</option>';
+            editSelect.innerHTML =
+              '<option value="">-- Chọn nhân viên --</option>';
+            data.forEach((nv) => {
+              const option = `<option value="${nv.id}">${nv.ten}</option>`;
+              addSelect.innerHTML += option;
+              editSelect.innerHTML += option;
+            });
+          });
       }
 
-      // Đảm bảo loader hiển thị trong đúng 2 giây
-      document.addEventListener("DOMContentLoaded", function () {
-        // Hiển thị content sau 2 giây, bất kể trang đã tải xong hay chưa
-        setTimeout(showContent, 1500);
-      });
+      window.onload = function () {
+        loadKho();
+        loadNhanVienOptions();
+      };
+
+      document
+        .querySelector("#addIngredientModal form")
+        .addEventListener("submit", function (e) {
+          const formdata = new FormData(this);
+          const data = {
+            ten_nguyen_lieu: formdata.get("ten_nguyen_lieu"),
+            so_luong: formdata.get("so_luong"),
+            don_vi: formdata.get("don_vi"),
+            trang_thai: formdata.get("trang_thai"),
+            nhanvien_id: formdata.get("nhanvien_id"),
+          };
+          fetch("/api/kho", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          }).then((res) => {
+            if (res.ok) {
+              loadKho();
+              this.reset();
+              document.getElementById("addIngredientModal").hide();
+            }
+          });
+        });
+
+      function editTable(
+        id,
+        ten_nguyen_lieu,
+        so_luong,
+        don_vi,
+        trang_thai,
+        nhanvien_id
+      ) {
+        document.getElementById("edit-id").value = id;
+        document.getElementById("edit-ten").value = ten_nguyen_lieu;
+        document.getElementById("edit-soluong").value = so_luong;
+        document.getElementById("edit-donvi").value = don_vi;
+        document.getElementById("edit-trangthai").value = trang_thai;
+        document.getElementById("edit-nhanvien-id").value = nhanvien_id;
+        const modal = new bootstrap.Modal(
+          document.getElementById("editIngredientModal")
+        );
+        modal.show();
+      }
+      document
+        .querySelector("#editIngredientModal form")
+        .addEventListener("submit", function (e) {
+          const formdata = new FormData(this);
+          const id = document.getElementById("edit-id").value;
+          const data = {
+            ten_nguyen_lieu: formdata.get("ten_nguyen_lieu"),
+            so_luong: formdata.get("so_luong"),
+            don_vi: formdata.get("don_vi"),
+            trang_thai: formdata.get("trang_thai"),
+            nhanvien_id: formdata.get("nhanvien_id"),
+          };
+          fetch(`/api/kho/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          }).then((res) => {
+            if (res.ok) {
+              loadKho();
+              const editModal = bootstrap.Modal.getInstance(
+                document.getElementById("editIngredientModal")
+              );
+              editModal.hide();
+            }
+          });
+        });
+      function deleteIngredient(id) {
+        if (confirm("Bạn có chắc chắn muốn xóa nguyên liệu này?")) {
+          fetch(`/api/kho/${id}`, {
+            method: "DELETE",
+          }).then((res) => {
+            if (res.ok) {
+              loadKho();
+            }
+          });
+        }
+      }
     </script>
     <script src="./main.js"></script>
   </body>

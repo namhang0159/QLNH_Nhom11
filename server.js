@@ -77,7 +77,7 @@ app.get("/api/nhanvien", (req, res) => {
 
 app.post("/api/nhanvien", (req, res) => {
   const nv = req.body;
-  const sql = `INSERT INTO NhanVien (ho_Ten, ngay_sinh, so_dien_thoai, email, vi_tri, luong, ten_tai_khoan, mat_khau, quyen, hieu_suat) 
+  const sql = `INSERT INTO NhanVien (ho_ten, ngay_sinh, so_dien_thoai, email, vi_tri, luong, ten_tai_khoan, mat_khau, quyen, hieu_suat) 
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const values = [
     nv.ho_ten,
@@ -113,7 +113,7 @@ app.put("/api/nhanvien/:id", (req, res) => {
   const nv = req.body;
 
   const sql = `UPDATE NhanVien 
-               SET ho_Ten = ?, ngay_sinh = ?, so_dien_thoai = ?, email = ?, vi_tri = ?, luong = ?, ten_tai_khoan = ?, mat_khau = ?, quyen = ?, hieu_suat = ?
+               SET ho_ten = ?, ngay_sinh = ?, so_dien_thoai = ?, email = ?, vi_tri = ?, luong = ?, ten_tai_khoan = ?, mat_khau = ?, quyen = ?, hieu_suat = ?
                WHERE id = ?`;
 
   const values = [
@@ -198,8 +198,8 @@ app.put("/api/hoadon/:ma_hoadon", (req, res) => {
   ];
   const rows = "SELECT * FROM HoaDon WHERE ma_hoadon = ?";
   db.query(rows, [hd.ma_hoadon], (err, rows) => {
-    if (rows.length > 0) {
-      return res.status(400).json({ message: "Mã hóa đơn đã tồn tại!" });
+    if (rows.length < 0) {
+      return res.status(400).json({ message: "Mã hóa đơn đã ko tồn tại!" });
     } else {
       db.query(sql, values, (err, result) => {
         if (err) {
@@ -590,7 +590,7 @@ app.put("/api/banan/:id", (req, res) => {
   const { SoChoNgoi, ViTri, TrangThai } = req.body;
   const sql = `
     UPDATE banan 
-    SET SoChoNgoi = ?, ViTri = ?, TrangThai = ? 
+    SET SoChoNgoi = ?, ViTri = ?
     WHERE MaBan = ?`;
   const values = [SoChoNgoi, ViTri, TrangThai, id];
 
@@ -840,15 +840,35 @@ app.get("/api/chitiethd", (req, res) => {
 
 app.post("/api/chitiethd", (req, res) => {
   const { MaHD, MaMon, SoLuong } = req.body;
-  const sqlInsert =
-    "INSERT INTO chitiethd (MaHD, MaMon, SoLuong) VALUES (?, ?, ?)";
-  db.query(sqlInsert, [MaHD, MaMon, SoLuong], (err, result) => {
+  const checkStockSql = "SELECT Gia,TrangThai FROM thucdon WHERE MaMon = ?";
+  db.query(checkStockSql, [MaMon], (err, results) => {
     if (err) {
-      /* xử lý lỗi */
+      console.error("Lỗi kiểm tra món ăn:", err);
+      return res.status(500).json({ message: "Lỗi server!" });
     }
 
-    // Cập nhật tổng tiền ngay sau khi thêm thành công
-    const sqlUpdate = `
+    if (results.length === 0) {
+      return res.status(400).json({ message: "Món ăn không tồn tại!" });
+    }
+
+    const { Gia, TrangThai } = results[0];
+
+    if (TrangThai === "Hết hàng") {
+      return res
+        .status(400)
+        .json({ message: "Món ăn đã hết hàng hoặc không đủ số lượng!" });
+    }
+    const sqlInsert =
+      "INSERT INTO chitiethd (MaHD, MaMon, SoLuong) VALUES (?, ?, ?)";
+    db.query(sqlInsert, [MaHD, MaMon, SoLuong], (err, result) => {
+      if (err) {
+        console.error("Lỗi thêm chi tiết hóa đơn:", err);
+        return res
+          .status(500)
+          .json({ message: "Lỗi khi thêm chi tiết hóa đơn!" });
+      }
+
+      const sqlUpdate = `
       UPDATE hoadon h
       SET tong_tien = (
         SELECT COALESCE(SUM(cd.SoLuong * td.Gia), 0)
@@ -858,18 +878,19 @@ app.post("/api/chitiethd", (req, res) => {
       )
       WHERE h.ma_hoadon = ?;
     `;
-    db.query(sqlUpdate, [MaHD, MaHD], (err2) => {
-      if (err2) console.error("Lỗi cập nhật tong_tien:", err2);
-      res
-        .status(201)
-        .json({ message: "Thêm chi tiết và cập nhật tổng tiền thành công!" });
+      db.query(sqlUpdate, [MaHD, MaHD], (err2) => {
+        if (err2) console.error("Lỗi cập nhật tong_tien:", err2);
+        res
+          .status(201)
+          .json({ message: "Thêm chi tiết và cập nhật tổng tiền thành công!" });
+      });
     });
   });
 });
 
 app.delete("/api/chitiethd/:MaCTHD", (req, res) => {
   const MaCTHD = req.params.MaCTHD;
-  // Trước hết, lấy MaHD của bản ghi sắp xóa để dùng khi cập nhật tổng tiền
+
   db.query(
     "SELECT MaHD FROM chitiethd WHERE MaCTHD = ?",
     [MaCTHD],
@@ -880,14 +901,12 @@ app.delete("/api/chitiethd/:MaCTHD", (req, res) => {
           .json({ message: "Không tìm thấy chi tiết hóa đơn" });
       const MaHD = rows[0].MaHD;
 
-      // Xóa bản ghi
       db.query("DELETE FROM chitiethd WHERE MaCTHD = ?", [MaCTHD], (err2) => {
         if (err2)
           return res
             .status(500)
             .json({ message: "Lỗi khi xóa chi tiết hóa đơn" });
 
-        // Cập nhật lại tổng tiền
         const sqlUpdate = `
         UPDATE hoadon h
         SET tong_tien = (

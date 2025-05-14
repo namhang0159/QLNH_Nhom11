@@ -75,9 +75,25 @@
       >
         Thêm Khách Hàng
       </button>
+      <form class="d-flex ms-2 mb-3" role="search">
+        <input
+          class="form-control me-2"
+          type="search"
+          placeholder="Tìm Kiếm Khách Hàng"
+          aria-label="Search"
+        />
+        <button
+          class="btn btn-outline-success"
+          type="button"
+          onclick="timkhachhang()"
+        >
+          Search
+        </button>
+      </form>
       <table class="table table-bordered">
         <thead class="table-dark">
           <tr>
+            <th>Id khách hàng</th>
             <th>Tên Khách Hàng</th>
             <th>Số Điện Thoại</th>
             <th>Email</th>
@@ -85,7 +101,7 @@
             <th>Hành Động</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="khachhangbody"></tbody>
       </table>
     </div>
 
@@ -108,7 +124,7 @@
             ></button>
           </div>
           <div class="modal-body">
-            <form>
+            <form id="addCustomerForm">
               <div class="mb-3">
                 <label class="form-label">Tên Khách Hàng</label>
                 <input type="text" class="form-control" />
@@ -195,23 +211,24 @@
 
         data.forEach((kh) => {
           tbody.innerHTML += `
-            <tr>
-              <td>${kh.HoTen}</td>
-              <td>${kh.SoDienThoai}</td>
-              <td>${kh.Email}</td>
-              <td>${kh.cap_bac}</td>
-              <td>
-                <button class="btn btn-warning btn-sm" onclick="editCustomer(${kh.MaKH})">Sửa</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteCustomer(${kh.MaKH})">Xóa</button>
-              </td>
-            </tr>
-          `;
+              <tr>
+                <td>${kh.MaKH}</td>
+                <td>${kh.HoTen}</td>
+                <td>${kh.SoDienThoai}</td>
+                <td>${kh.Email}</td>
+                <td>${kh.cap_bac}</td>
+                <td>
+                  <button class="btn btn-warning btn-sm" onclick="editCustomer(${kh.MaKH})">Sửa</button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteCustomer(${kh.MaKH})">Xóa</button>
+                </td>
+              </tr>
+            `;
         });
       }
 
       // Thêm khách hàng mới
       document
-        .querySelector("form")
+        .getElementById("addCustomerForm")
         .addEventListener("submit", async function (e) {
           e.preventDefault();
           const inputs = this.querySelectorAll("input, select");
@@ -295,6 +312,25 @@
           modal.hide();
           loadCustomers();
         });
+      function timkhachhang() {
+        const searchInput = document.querySelector('input[type="search"]');
+        const searchValue = searchInput.value.toLowerCase();
+        const rows = document.querySelectorAll("#khachhangbody tr");
+        rows.forEach((row) => {
+          const cells = row.querySelectorAll("td");
+          let found = false;
+          cells.forEach((cell) => {
+            if (cell.textContent.toLowerCase().includes(searchValue)) {
+              found = true;
+            }
+          });
+          if (found) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
     </script>
     <script src="./main.js"></script>
   </body>

@@ -81,7 +81,6 @@
             <th>Mã Bàn Ăn</th>
             <th>Số Chỗ Ngồi</th>
             <th>Vị Trí</th>
-            <th>Trạng thái</th>
             <th>Hành động</th>
           </tr>
         </thead>
@@ -115,10 +114,6 @@
               name="vitri"
               required
             />
-            <select class="form-select" name="trangthai" required>
-              <option value="Trống">Trống</option>
-              <option value="Đã Đặt">Đã Đặt</option>
-            </select>
           </div>
           <div class="modal-footer">
             <button type="submit" class="btn btn-primary">Lưu</button>
@@ -160,10 +155,6 @@
               name="vitri"
               required
             />
-            <select class="form-select" name="trangthai" required>
-              <option value="Trống">Trống</option>
-              <option value="Đã Đặt">Đã Đặt</option>
-            </select>
           </div>
           <div class="modal-footer">
             <button type="submit" class="btn btn-success">Cập nhật</button>
@@ -186,7 +177,7 @@
                 <td>${ban.MaBan}</td>
                 <td>${ban.SoChoNgoi}</td>
                 <td>${ban.ViTri}</td>
-                <td>${ban.TrangThai || "---"}</td>
+                
                 <td>
                   <button class="btn btn-warning btn-sm" onclick="editTable(${
                     ban.MaBan
@@ -214,7 +205,6 @@
           const data = {
             SoChoNgoi: formData.get("socho"),
             ViTri: formData.get("vitri"),
-            TrangThai: formData.get("trangthai"),
           };
 
           fetch("/api/banan", {
@@ -235,12 +225,12 @@
         });
 
       // Mở modal sửa bàn ăn
-      function editTable(maban, socho, vitri, trangthai) {
+      function editTable(maban, socho, vitri) {
         const form = document.getElementById("editTableForm");
         form.maban.value = maban;
         form.socho.value = socho;
         form.vitri.value = vitri;
-        form.trangthai.value = trangthai;
+
         new bootstrap.Modal(document.getElementById("editTableModal")).show();
       }
 

@@ -184,11 +184,22 @@
             MaMon: parseInt(document.getElementById("inputMaMon").value),
             SoLuong: parseInt(document.getElementById("inputSoLuong").value),
           };
-          await fetch("/api/chitiethd", {
+
+          const response = await fetch("/api/chitiethd", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
           });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            alert(result.message || "Có lỗi xảy ra khi thêm món!");
+            return;
+          }
+
+          alert("Thêm món vào hóa đơn thành công!");
+
           const addModal = bootstrap.Modal.getInstance(
             document.getElementById("addModal")
           );
